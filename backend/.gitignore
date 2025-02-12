@@ -1,0 +1,13 @@
+# Logs
+logs
+*.log
+
+# Temporary files
+tmp/
+temp/
+
+# Composer vendor directory
+vendor/
+
+# Environment variables
+.env

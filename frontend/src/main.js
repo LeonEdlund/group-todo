@@ -1,8 +1,20 @@
-const fetchData = async (url) => {
-  const data = await fetch(url);
-  const response = await data.text();
-  console.log(response);
-  document.getElementById("app").innerHTML = response;
-}
+import { SvgGenerator } from "./classes/SvgGenerator";
 
-fetchData("/view/projects.html");
+// const fetchData = async (url) => {
+//   const data = await fetch(url);
+//   const response = await data.text();
+//   console.log(response);
+//   document.getElementById("app").innerHTML = response;
+// }
+
+// fetchData("/view/projects.html");
+
+
+const svgGenerator = new SvgGenerator();
+let toDoItems = document.querySelectorAll(".todo-group-item .img-container");
+toDoItems.forEach(item => {
+  item.appendChild(svgGenerator.generateSvg());
+});
+svgGenerator.generateSvg();
+
+

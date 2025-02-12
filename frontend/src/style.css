@@ -6,6 +6,5 @@
 /* DEFAULT STYLES */
 @import url("styles/reset.css");
 @import url("styles/util-styles.css");
+@import url("styles/components.css");
 @import url("styles/main.css");
-
-

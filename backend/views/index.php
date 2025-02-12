@@ -8,7 +8,7 @@
 </head>
 
 <body>
-  <h1>hello from views</h1>
+  <h1>Your projects</h1>
 </body>
 
 </html>

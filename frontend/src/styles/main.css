@@ -22,6 +22,9 @@
   --color-primary: #2497F0;
   --color-secondary: #282828;
   --color-accent: #FFFFFF;
+
+  /* RADIUS */
+  --boarder-radius-primary: 25px;
 }
 
 html {
@@ -31,6 +34,12 @@ html {
 
 body {
   margin: 0 10px;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
 }
 
 h1 {
@@ -44,6 +53,7 @@ h2 {
   font-family: var(--font-family-lexend);
   font-size: var(--font-heading);
   font-weight: var(--font-weight-medium);
+  line-height: 1.2;
 }
 
 h3 {

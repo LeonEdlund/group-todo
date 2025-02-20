@@ -1,4 +1,8 @@
 import { SvgGenerator } from "./classes/SvgGenerator";
+import "./components/btn-big-blue/btn-big-blue";
+import "./components/header/header";
+import "./components/project-card/project-card";
+import "./components/progress-bar/progress-bar";
 
 // const fetchData = async (url) => {
 //   const data = await fetch(url);
@@ -8,13 +12,3 @@ import { SvgGenerator } from "./classes/SvgGenerator";
 // }
 
 // fetchData("/view/projects.html");
-
-
-const svgGenerator = new SvgGenerator();
-let toDoItems = document.querySelectorAll(".todo-group-item .img-container");
-toDoItems.forEach(item => {
-  item.appendChild(svgGenerator.generateSvg());
-});
-svgGenerator.generateSvg();
-
-

@@ -6,13 +6,8 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:8080',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, 'to-do/backend/api/'),
-      },
-      '/view': {
-        target: 'http://localhost:8080',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/view/, 'to-do/backend/views/'),
+        rewrite: (path) => path.replace(/^\/api/, 'to-do/backend/'),
       }
     },
-  },
+  }
 });

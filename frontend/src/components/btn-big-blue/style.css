@@ -1,0 +1,11 @@
+button {
+  font-weight: 700;
+  font-size: 48px;
+  line-height: 0.6;
+  background-color: var(--color-primary);
+  border-radius: 50%;
+  width: 1.4em;
+  height: 1.4em;
+  display: grid;
+  place-items: center;
+}

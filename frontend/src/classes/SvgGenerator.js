@@ -1,32 +1,31 @@
 import { createPolygon, generatePathString } from 'useless-blobs';
 
 export class SvgGenerator {
-  constructor(options) {
-    this.smoothing = 1;
-    this.options = options || {
-      verts: 30,
-      width: 600,
-      height: 400,
-      irregularity: .5,
+  static generateSvg() {
+    const smoothing = Math.random();
+    const options = {
+      verts: Math.floor(Math.random() * 50) + 5,
+      width: 500,
+      height: 600,
+      irregularity: Math.random(),
       spikiness: 0.8,
       boundingShape: 'eclipse'
     };
-  }
-
-  colors = ["#79DAEF", "#EF7979", "#AC79EF"];
-
-  generateSvg() {
-    const polygonPoints = createPolygon(this.options);
-    const pathString = generatePathString(polygonPoints, this.smoothing);
+    const colors = ["#79DAEF", "#EF7979", "#AC79EF", "#EF79AE", "#DF5543"];
+    const polygonPoints = createPolygon(options);
+    const pathString = generatePathString(polygonPoints, smoothing);
     const svgNS = "http://www.w3.org/2000/svg";
     const svg = document.createElementNS(svgNS, "svg");
-    svg.setAttribute("width", this.options.width);
-    svg.setAttribute("height", this.options.height);
-    svg.setAttribute("fill", this.colors[Math.floor(Math.random() * this.colors.length)]);
-
     const pathEl = document.createElementNS(svgNS, "path");
+
+    svg.setAttribute("width", "100%");
+    svg.setAttribute("height", "100%");
+    svg.setAttribute("fill", colors[Math.floor(Math.random() * colors.length)]);
     pathEl.setAttribute("d", pathString);
     svg.appendChild(pathEl);
+    console.log(options);
+    console.log(svg);
     return svg;
+
   }
 }

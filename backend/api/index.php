@@ -1,14 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
+<?php
+require "../models/Database.php";
+$db = new Database();
+$method = $_SERVER["REQUEST_METHOD"];
+$params = $_GET;
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
+echo $method;
+switch ($method) {
+  case 'GET':
 
-<body>
-  <h1>hello from api</h1>
-</body>
+    break;
+  default:
 
-</html>
+    break;
+}

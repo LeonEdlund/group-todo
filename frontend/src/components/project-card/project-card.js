@@ -1,41 +1,36 @@
-import sharedStyles from "../../styles/shared-styles.css?inline";
-import style from "./style.css?inline";
+import template from "./template";
 import { SvgGenerator } from "../../classes/SvgGenerator";
 
 class GroupCard extends HTMLElement {
   constructor() {
     super();
-    this.shadow = this.attachShadow({ mode: 'open' });
-    this.#render();
+    this.attachShadow({ mode: 'open' });
+    this.shadowRoot.appendChild(template.content.cloneNode(true));
   }
 
-  #render() {
-    this.shadow.innerHTML = `
-      <style>
-        ${sharedStyles}
-        ${style}
-      </style>
+  connectedCallback() {
+    this.shadowRoot.querySelector(".img-container").appendChild(SvgGenerator.generateSvg());
+  }
 
-    <div class="to-do-items-wrapper">
-      <div class="todo-group-item">
-        <div class="img-container"></div>
-        <div class="todo-group-item-wrapper">
-          <div class="flex-row space-between align-center">
-            <h2 class="todo-group-item-title">My First group project</h2>
-            <button class="btn-three-dots"><img src="src/resources/three-dots.svg" alt="three-dots"></button>
-          </div>
-          <ul class="reset-ul">
-            <li><i>Leon Edlund</i></li>
-            <li><i>Theo Myrvold</i></li>
-            <li><i>Jesper Milton</i></li>
-            <li><i>+2</i></li>
-          </ul>
-          <p class="date place-right">19/02-25</p>
-          <progress-bar completed="71%" ></progress-bar>
-        </div>
-      </div>`;
+  static get observedAttributes() {
+    return ["title", "created", "progress"];
+  }
 
-    this.shadow.querySelector(".img-container").appendChild(SvgGenerator.generateSvg());
+  attributeChangedCallback(name, oldValue, newValue) {
+    switch (name) {
+      case "title":
+        const title = this.getAttribute("title") || "Title";
+        this.shadowRoot.querySelector("h2").innerText = title;
+        break;
+      case "created":
+        const createdAt = this.getAttribute("created") || "No Date";
+        this.shadowRoot.querySelector(".date").innerText = createdAt;
+        break;
+      case "progress":
+        const progress = this.getAttribute("progress") || "0%";
+        this.shadowRoot.querySelector("progress-bar").setAttribute("completed", progress);
+        break;
+    }
   }
 }
 

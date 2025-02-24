@@ -27,15 +27,10 @@
   width: 0.9rem;
 } */
 
-/* CLOSE BTN */
-.btn-close {
-  /* transform: rotate(45deg); */
-}
-
-.btn-arrow {
+/* .btn-arrow {
   font-size: 2.2rem;
   margin-right: 1rem;
-}
+} */
 
 /* PROGRESS-BAR
 .to-do-items-wrapper {
@@ -101,7 +96,7 @@
 } */
 
 /* GROUP NAME INPUT FIELD */
-#input-group-name {
+/* #input-group-name {
   font-size: var(--font-heading);
   padding: 0;
   background-color: unset;
@@ -121,4 +116,4 @@
 
 .name-input-wrapper {
   margin-top: 1.2rem;
-}
+} */

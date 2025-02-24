@@ -23,8 +23,6 @@ export class SvgGenerator {
     svg.setAttribute("fill", colors[Math.floor(Math.random() * colors.length)]);
     pathEl.setAttribute("d", pathString);
     svg.appendChild(pathEl);
-    console.log(options);
-    console.log(svg);
     return svg;
 
   }

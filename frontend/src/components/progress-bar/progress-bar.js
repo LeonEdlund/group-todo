@@ -1,11 +1,10 @@
-import sharedStyles from "../../styles/shared-styles.css?inline";
-import style from "./style.css?inline";
+import template from "./template";
 
 class ProgressBar extends HTMLElement {
   constructor() {
     super();
-    this.shadow = this.attachShadow({ mode: 'open' });
-    this.#render();
+    this.attachShadow({ mode: 'open' });
+    this.shadowRoot.appendChild(template.content.cloneNode(true));
   }
 
   static get observedAttributes() {
@@ -18,20 +17,8 @@ class ProgressBar extends HTMLElement {
     }
   }
 
-  #render() {
-    this.shadow.innerHTML = `
-      <style>
-        ${sharedStyles}
-        ${style}
-      </style>
-      
-      <div id="progress-bar">
-        <div id="progress-bar-indicator"></div>
-      </div>`;
-  }
-
   #updateBar(value) {
-    this.shadow.getElementById("progress-bar-indicator").style.width = value;
+    this.shadowRoot.getElementById("progress-bar-indicator").style.width = value;
   }
 }
 

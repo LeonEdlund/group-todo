@@ -1,14 +1,5 @@
-import { SvgGenerator } from "./classes/SvgGenerator";
-import "./components/btn-big-blue/btn-big-blue";
-import "./components/header/header";
-import "./components/project-card/project-card";
-import "./components/progress-bar/progress-bar";
+import "./register-components.js"
+// import Router from "./Router"
 
-// const fetchData = async (url) => {
-//   const data = await fetch(url);
-//   const response = await data.text();
-//   console.log(response);
-//   document.getElementById("app").innerHTML = response;
-// }
 
-// fetchData("/view/projects.html");
+document.getElementById("app").innerHTML = "<home-view></home-view>"

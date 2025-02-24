@@ -13,7 +13,7 @@ class Database
    */
   public function __construct()
   {
-    $config = require '../config/config.php';
+    $config = require 'config/config.php';
 
     try {
       $this->connection = new PDO(

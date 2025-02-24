@@ -1,6 +1,7 @@
 <?php
-require "../models/Database.php";
-$db = new Database();
+echo $_SERVER["DOCUMENT_ROOT"];
+// require "../models/Database.php";
+// $db = new Database();
 $method = $_SERVER["REQUEST_METHOD"];
 $params = $_GET;
 

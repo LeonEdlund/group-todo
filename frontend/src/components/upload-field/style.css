@@ -1,5 +1,7 @@
+@import url(../../styles/shared-styles.css);
+
 #input-group-name {
-  font-size: var(--font-heading);
+  font-size: var(--font-heading-2);
   padding: 0;
   background-color: unset;
   border: none;
@@ -24,4 +26,9 @@
   font-size: 2rem;
   margin-right: 1rem;
   opacity: 0.7;
+}
+
+.todo-group-item {
+  border-bottom: 1px solid rgb(175, 175, 175);
+  ;
 }

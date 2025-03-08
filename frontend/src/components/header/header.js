@@ -2,8 +2,8 @@ import template from "./template";
 import style from "./style.css?inline";
 import { addStylesheetToShadowRoot } from "../../utils/style-manipulation";
 
-class ProgressBar extends HTMLElement {
-  static observedAttributes = ["completed"]
+class Header extends HTMLElement {
+  static observedAttributes = ["title"];
 
   constructor() {
     super();
@@ -13,10 +13,10 @@ class ProgressBar extends HTMLElement {
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
-    if (name === "completed") {
-      this.shadowRoot.getElementById("progress-bar-indicator").style.width = newValue;
+    if (name === "title") {
+      this.shadowRoot.getElementById("title").innerHTML = this.getAttribute("title") || "Title";
     }
   }
 }
 
-customElements.define("progress-bar", ProgressBar);
+customElements.define("custom-header", Header);

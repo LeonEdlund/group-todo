@@ -1,22 +1,24 @@
 import template from "./template";
+import style from "./style.css?inline";
+import threeDotsImg from "../../resources/three-dots.svg";
+import { addStylesheetToShadowRoot } from "../../utils/style-manipulation";
 import { SvgGenerator } from "../../classes/SvgGenerator";
 
-class GroupCard extends HTMLElement {
+class ProjectCard extends HTMLElement {
+  static observedAttributes = ["title", "created", "progress", "cover_img"];
+
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
+    addStylesheetToShadowRoot(style, this.shadowRoot);
   }
 
   connectedCallback() {
-    this.shadowRoot.querySelector(".img-container").appendChild(SvgGenerator.generateSvg());
+    this.shadowRoot.getElementById("three-dots-img").src = threeDotsImg;
   }
 
-  static get observedAttributes() {
-    return ["title", "created", "progress"];
-  }
-
-  attributeChangedCallback(name, oldValue, newValue) {
+  attributeChangedCallback(name) {
     switch (name) {
       case "title":
         const title = this.getAttribute("title") || "Title";
@@ -30,8 +32,12 @@ class GroupCard extends HTMLElement {
         const progress = this.getAttribute("progress") || "0%";
         this.shadowRoot.querySelector("progress-bar").setAttribute("completed", progress);
         break;
+      case "cover_img":
+        const coverImg = this.getAttribute("cover_img") || SvgGenerator.generateSvg().outerHTML
+        this.shadowRoot.querySelector(".img-container").innerHTML = coverImg;
+        break;
     }
   }
 }
 
-customElements.define("project-card", GroupCard);
+customElements.define("project-card", ProjectCard);

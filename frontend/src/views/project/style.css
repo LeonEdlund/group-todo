@@ -1,0 +1,39 @@
+.btn-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.6rem 0;
+}
+
+.round-decoration {
+  background-color: var(--color-accent);
+  opacity: 0.8;
+  font-size: 2rem;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+}
+
+.btn-container button {
+  background-color: var(--color-accent);
+  color: var(--color-background);
+  display: grid;
+  place-items: center;
+  font-size: 2rem;
+  font-weight: bold;
+  width: 1.8em;
+  height: 1.8em;
+  border-radius: 50%;
+}
+
+#backbar {
+  padding: 1.5rem 0;
+}
+
+.tasks {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}

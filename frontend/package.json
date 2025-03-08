@@ -12,7 +12,10 @@
     "vite": "^6.1.0"
   },
   "dependencies": {
+    "date-fns": "^4.1.0",
     "generate-random-shapes": "^0.0.2",
-    "useless-blobs": "^1.1.4"
+    "gsap": "^3.12.7",
+    "useless-blobs": "^1.1.4",
+    "vanilla-router": "^1.2.8"
   }
 }

@@ -1,0 +1,24 @@
+@import url("../../styles/shared-styles.css");
+
+.header {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+#content-container {
+  position: relative;
+}
+
+#pop-up {
+  position: absolute;
+  top: 0px;
+  z-index: 3;
+  background: var(--color-background);
+  width: 100%;
+  height: 100%;
+}
+
+.hidden {
+  display: none;
+}

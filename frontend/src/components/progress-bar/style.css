@@ -1,4 +1,5 @@
-/* PROGRESS-BAR */
+@import url(../../styles/shared-styles.css);
+
 #progress-bar {
   position: relative;
   border: 2px solid white;

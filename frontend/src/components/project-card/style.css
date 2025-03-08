@@ -1,5 +1,8 @@
+@import url(../../styles/shared-styles.css);
+
 .btn-three-dots {
   background-color: var(--color-accent);
+  background-image: url("src/resources/three-dots.svg");
   color: black;
   padding: 0.8rem;
   border-radius: 50%;
@@ -21,6 +24,7 @@
   position: relative;
   overflow: hidden;
   border-radius: var(--boarder-radius-primary);
+  /* min-height: 15rem; */
 }
 
 .todo-group-item-wrapper {
@@ -32,6 +36,7 @@
 
 .todo-group-item-title {
   max-width: 60%;
+  text-transform: capitalize;
 }
 
 .todo-group-item .img-container {
@@ -50,8 +55,10 @@
   opacity: 0.7;
 }
 
-
-
 .date {
   font-family: var(--font-family-lexend);
+}
+
+#members {
+  min-height: 6rem;
 }

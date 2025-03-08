@@ -1,0 +1,98 @@
+@import url(../../styles/shared-styles.css);
+
+/* CHECK BOX */
+.clear {
+  clear: both;
+}
+
+.checkBox {
+  display: block;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  border: 3px solid rgba(255, 255, 255, 0);
+  border-radius: 50%;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0px 0px 0px 2px var(--color-accent);
+}
+
+.checkBox div {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-accent);
+  top: -52px;
+  left: -52px;
+  position: absolute;
+  transform: rotateZ(45deg);
+  z-index: 100;
+}
+
+.checkBox input[type=checkbox]:checked+div {
+  left: -10px;
+  top: -10px;
+}
+
+.checkBox input[type=checkbox] {
+  position: absolute;
+  left: 50px;
+  visibility: hidden;
+}
+
+.transition {
+  transition: 300ms ease;
+}
+
+/* CONTENT */
+
+.task-wrapper .visible-content {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.task-title {
+  font-weight: bold;
+  line-height: 1;
+}
+
+.task-wrapper {
+  background-color: var(--color-secondary);
+  padding: 0.7rem 1.2rem;
+  border-radius: 18px;
+}
+
+.visible-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#left-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+#description-wrapper {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 150ms ease-in-out;
+}
+
+#description-wrapper.expanded {
+  max-height: 600px;
+}
+
+#description-wrapper::before {
+  content: "";
+  display: block;
+  height: 1px;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.355);
+  margin: 0.7rem 0;
+}
+
+#arrow-btn {
+  transition: transform 150ms;
+}

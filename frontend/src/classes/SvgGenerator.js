@@ -24,6 +24,6 @@ export class SvgGenerator {
     pathEl.setAttribute("d", pathString);
     svg.appendChild(pathEl);
     return svg;
-
   }
 }
+

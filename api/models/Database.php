@@ -43,8 +43,86 @@ class Database
     return $stmt;
   }
 
+  /** 
+   * Returns a string of the last inserted id. 
+   * 
+   * @return String
+   */
   public function lastInsertId()
   {
     return $this->connection->lastInsertId();
+  }
+
+  /** 
+   * Returns all projects
+   * 
+   * @return Object
+   */
+  public function getAllProjects()
+  {
+    $query = "SELECT 
+    projects.project_id,
+    projects.title,
+    projects.cover_svg AS img,
+    projects.created_at,
+    CONCAT(owner.first_name, ' ', owner.last_name) AS owner,
+    JSON_ARRAYAGG(
+    JSON_OBJECT('name', CONCAT(members.first_name, ' ', members.last_name))) AS members,
+    CASE 
+      WHEN COUNT(tasks.task_id) = 0 THEN 0 
+      ELSE (SUM(CASE WHEN tasks.completion_status = 'completed' THEN 1 ELSE 0 END) * 100.0 / COUNT(tasks.task_id))
+    END AS progress_percentage
+    FROM projects
+    INNER JOIN users AS owner ON projects.owner_id = owner.user_id
+    LEFT JOIN project_members ON project_members.project_id = projects.project_id
+    LEFT JOIN users AS members ON project_members.user_id = members.user_id
+    LEFT JOIN tasks ON tasks.project_id = projects.project_id
+    GROUP BY projects.project_id ORDER BY projects.project_id DESC;";
+
+    return $this->query($query)->fetchAll();
+  }
+
+  /** 
+   * Returns a single project
+   * 
+   * @param string - id of the project
+   * @return Object
+   */
+  public function getProject($id)
+  {
+    $query = "SELECT 
+    projects.project_id,
+    projects.title,
+    projects.cover_svg AS img,
+    projects.created_at,
+    CONCAT(owner.first_name, ' ', owner.last_name) AS owner,
+    JSON_ARRAYAGG(
+    JSON_OBJECT('name', CONCAT(members.first_name, ' ', members.last_name))) AS members
+    FROM projects
+    INNER JOIN users AS owner ON projects.owner_id = owner.user_id
+    LEFT JOIN project_members ON project_members.project_id = projects.project_id
+    LEFT JOIN users AS members ON project_members.user_id = members.user_id
+    WHERE projects.project_id = :id
+    GROUP BY projects.project_id ORDER BY projects.project_id DESC;";
+
+    return $this->query($query, [":id" => $id])->fetch();
+  }
+
+  public function insertProject($title, $owner, $svg)
+  {
+    $query = "INSERT INTO `projects` (`owner_id`, `title`, `cover_svg`) VALUES (:owner_id, :title, :svg);";
+    $this->query($query, [":owner_id" => $owner, ":title" => $title, ":svg" => $svg]);
+
+    return ["id" => $this->lastInsertId()];
+  }
+
+
+  public function insertTask($args)
+  {
+    $query = "INSERT INTO `tasks` (`project_id`, `assigned_to`, `title`, `description_text`, `difficulty_level`) VALUES (:project_id, :assigned_to, :title, :description_text, :difficulty_level)";
+
+    $this->query($query, [":project_id" => $args["projectId"], ":assigned_to" => $args["assignedTo"], ":title" => $args["title"], ":description_text" => $args["description"],  ":difficulty_level" => $args["difficulty"]]);
+
+    return ["id" => $this->lastInsertId()];
   }
 }

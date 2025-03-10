@@ -7,11 +7,10 @@ export async function getData(path) {
   }
 }
 
-export async function uploadJSON(path, body) {
-  console.log(body)
+export async function uploadJSON(path, method, body) {
   try {
     const response = await fetch(path, {
-      method: "POST",
+      method: method,
       headers: {
         "Content-Type": "application/json",
       },

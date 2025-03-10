@@ -29,7 +29,7 @@ class UploadField extends HTMLElement {
       return;
     };
 
-    const response = await uploadJSON("/api/add-project", {
+    const response = await uploadJSON("/api/add-project", "POST", {
       title: this.shadowRoot.querySelector("input").value,
       owner: "1",
       svg: SvgGenerator.generateSvg().outerHTML

@@ -11,5 +11,6 @@ import "./components/form-add-task/form-add-task.js";
 // views
 import "./views/home/home-view.js";
 import "./views/project/project-view.js";
+import "./views/login/LogInView.js";
 
 import "./Router.js";

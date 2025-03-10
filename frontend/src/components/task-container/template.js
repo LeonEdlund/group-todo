@@ -13,8 +13,8 @@ template.innerHTML = `
             </div>
             
             <div>
-              <p id="task-title">Create something</p>
-              <i>Leon Edlund</i>
+              <p id="task-title"></p>
+              <i id="assigned"></i>
             </div>
           </div>
           
@@ -23,10 +23,10 @@ template.innerHTML = `
 
         <div id="description-wrapper">
           <p>Description</p>
-          <i>Hello</i>
+          <i id="description"></i>
         
           <p>Difficulty</p>
-          <i>Medium</i>
+          <i id="difficulty"></i>
         </div>
           
       </div>`;

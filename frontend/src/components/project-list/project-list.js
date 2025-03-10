@@ -1,8 +1,8 @@
 import template from "./template";
 import style from "./style.css?inline";
 import { addStylesheetToShadowRoot } from "../../utils/style-manipulation";
-import { format, parseISO } from "date-fns";
 import { router } from "../../Router";
+import createCard from "../../utils/createCard";
 
 class ProjectList extends HTMLElement {
   #itemWrapper;
@@ -33,44 +33,14 @@ class ProjectList extends HTMLElement {
   }
 
   #createCards(data) {
-    data.forEach(project => {
-      const card = document.createElement("project-card");
-      const createdAt = format(parseISO(project.created_at), "dd/MM-yy");
-      card.setAttribute("id", project.project_id);
-      card.setAttribute("title", project.title);
-      card.setAttribute("created", createdAt);
-      console.log(project.created_at);
-      card.setAttribute("cover_img", project.img);
-      card.setAttribute("progress", `${project.progress_percentage}%`);
+    if (data.length === 0) {
+      this.#itemWrapper.innerHTML = "<p>No projects</p>";
+      return;
+    }
 
-      const owner = document.createElement("li");
-      owner.setAttribute("slot", "member-list-item");
-      const wrapper = document.createElement("i");
+    const cards = data.map(card => createCard(card));
 
-      wrapper.innerText = project.owner;
-      owner.appendChild(wrapper);
-      card.appendChild(owner);
-
-      const members = JSON.parse(project.members);
-      for (let i = 0; i < members.length; i++) {
-        const listItem = document.createElement("li");
-        listItem.setAttribute("slot", "member-list-item");
-        const wrapper = document.createElement("i");
-
-        if (i < 2) {
-          wrapper.innerText = members[i].name;
-          listItem.appendChild(wrapper);
-          card.appendChild(listItem);
-        } else {
-          wrapper.innerText = "+2";
-          listItem.appendChild(wrapper);
-          card.appendChild(listItem);
-          break;
-        }
-      }
-
-      this.#itemWrapper.appendChild(card);
-    });
+    this.#itemWrapper.append(...cards);
   }
 
   navigateTo(event) {

@@ -21,15 +21,13 @@ router.add('', function () {
 router.add('project/(:num)', function (id) {
   app.innerHTML = "";
   const projectView = document.createElement("project-view");
-  projectView.setAttribute("id", id);
   app.appendChild(projectView);
 });
 
-router.add('project/(:num)/add-task', function (id) {
+router.add("login", function () {
   app.innerHTML = "";
-  const formAddTask = document.createElement("form-add-task");
-  formAddTask.setAttribute("project-Id", id);
-  app.appendChild(formAddTask);
+  const loginView = document.createElement("login-view");
+  app.appendChild(loginView);
 });
 
 router.addUriListener();

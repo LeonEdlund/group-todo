@@ -25,6 +25,15 @@ $app->get("/project/{id:\d+}", function ($req, $res, $args) {
   return $res->withJson($project);
 });
 
+// Specific project - Returns a post based on id 
+$app->get("/tasks/{id:\d+}", function ($req, $res, $args) {
+  global $db;
+
+  $tasks = $db->getTasks($args["id"]);
+
+  return $res->withJson($tasks);
+});
+
 // Post - Returns a specific post 
 $app->post("/add-project", function ($req, $res, $args) {
   global $db;
@@ -44,5 +53,17 @@ $app->post("/add-task", function ($req, $res, $args) {
 
   return $res->withJson(["input" => $input]);
 });
+
+
+// Patch - Updates the completion status of a task
+$app->patch("/task/update-completion", function ($req, $res, $args) {
+  global $db;
+
+  $input = $req->getParsedBody();
+  $response = $db->updateTaskCompletionStatus($input["id"], $input["status"]);
+
+  return $res->withJson($response);
+});
+
 
 $app->run();

@@ -15,7 +15,7 @@ class FormAddTask extends HTMLElement {
     this.shadowRoot.appendChild(template.content.cloneNode(true));
     addStylesheetToShadowRoot(style, this.shadowRoot);
 
-    this.#projectId = null;
+    this.#projectId = location.pathname.split("/").pop();
   }
 
   connectedCallback() {
@@ -42,7 +42,7 @@ class FormAddTask extends HTMLElement {
     const formData = new FormData(form);
     const formObject = Object.fromEntries(formData.entries());
 
-    const response = await uploadJSON("/api/add-task", {
+    const response = await uploadJSON("/api/add-task", "POST", {
       projectId: this.#projectId,
       title: formObject.title,
       description: formObject.description,
@@ -50,6 +50,8 @@ class FormAddTask extends HTMLElement {
       assignedTo: formObject["assigned-too"]
     });
 
+    const taskAddedEvent = new CustomEvent("taskAdded");
+    this.dispatchEvent(taskAddedEvent);
     console.log(response);
     //router.back();
   }

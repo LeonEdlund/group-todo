@@ -18,6 +18,6 @@ template.innerHTML = `
     <option value="hard">Hard</option>
   </select>
 
-  <button type="submit" id="submit">ADD</button>
+  <button type="modal" id="submit">ADD</button>
 </form>
 </div>`;

@@ -1,13 +1,7 @@
-import sharedStyles from "../../styles/shared-styles.css?inline";
-import style from "./style.css?inline";
-
 const template = document.createElement("template");
-template.innerHTML = `
-      <style>
-        ${sharedStyles}
-        ${style}
-      </style>
+export default template;
 
+template.innerHTML = `
     <custom-header title="Your<br>Projects"></custom-header>
 
     <div id="content-container">
@@ -20,5 +14,3 @@ template.innerHTML = `
       </div>
     </div>
     `;
-
-export default template;

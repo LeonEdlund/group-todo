@@ -25,8 +25,10 @@ template.innerHTML = `
           <p>Description</p>
           <i id="description"></i>
         
-          <p>Difficulty</p>
-          <i id="difficulty"></i>
+
         </div>
           
       </div>`;
+
+//       <p>Completed By</p>
+// <i id="completed-by"></i>

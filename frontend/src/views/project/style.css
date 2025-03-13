@@ -1,25 +1,43 @@
 @import url("../../styles/shared-styles.css");
 
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.closeBtn {
+  font-family: var(--font-family-inter);
+  font-size: x-large;
+}
+
 .btn-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+  gap: 1.4rem;
   padding: 0.6rem 0;
 }
 
 .round-decoration {
+  font-family: var(--font-family-lexend);
+  color: var(--color-background);
   background-color: var(--color-accent);
-  opacity: 0.8;
-  font-size: 2rem;
-  width: 2.2rem;
-  height: 2.2rem;
+  font-size: 1.2rem;
+  width: 2.7rem;
+  height: 2.7rem;
   border-radius: 50%;
+  text-align: center;
+
+  display: grid;
+  place-items: center;
 }
 
-.btn-container button {
+#add-task {
   background-color: var(--color-accent);
   color: var(--color-background);
+  font-family: var(--font-family-inter);
   display: grid;
   place-items: center;
   font-size: 2rem;
@@ -30,7 +48,12 @@
 }
 
 #backbar {
-  padding: 1.5rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 1rem 0;
+  background-color: var(--color-background);
+
 }
 
 #tasks-wrapper {
@@ -42,6 +65,7 @@
 
 dialog {
   background-color: var(--color-background);
+  color: var(--color-text);
   border: none;
   position: fixed;
   top: 50%;
@@ -52,8 +76,36 @@ dialog {
   width: 95%;
   height: 90svh;
   border-radius: 10px;
+  overflow: hidden;
+}
+
+dialog button:focus {
+  outline: none;
+  border: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 dialog::backdrop {
   background-color: rgba(0, 0, 0, 0.757);
+}
+
+#score-wrapper {
+  overflow: scroll;
+}
+
+
+@keyframes modalOpen {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -60%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+dialog[open] {
+  animation: modalOpen 0.3s ease-out;
 }

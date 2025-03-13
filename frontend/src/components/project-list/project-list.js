@@ -2,6 +2,7 @@ import template from "./template";
 import style from "./style.css?inline";
 import { addStylesheetToShadowRoot } from "../../utils/style-manipulation";
 import { router } from "../../Router";
+import { getData } from "../../utils/api";
 import createCard from "../../utils/createCard";
 
 class ProjectList extends HTMLElement {
@@ -28,7 +29,7 @@ class ProjectList extends HTMLElement {
   }
 
   async #fetchData() {
-    const data = await fetch("/api/projects").then(response => response.json());
+    const data = await getData("/api/projects");
     return data;
   }
 

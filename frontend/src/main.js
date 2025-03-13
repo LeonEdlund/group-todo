@@ -7,6 +7,9 @@ import "./components/project-list/project-list";
 import "./components/upload-field/upload-field";
 import "./components/task-container/task-container";
 import "./components/form-add-task/form-add-task.js";
+import "./components/form-add-task/form-add-task.js";
+import "./components/nav-footer/nav-footer.js";
+import "./components/user-score-card/user-score-card.js";
 
 // views
 import "./views/home/home-view.js";

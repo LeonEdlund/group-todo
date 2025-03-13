@@ -11,6 +11,15 @@ class LogInView extends HTMLElement {
   }
 
   connectedCallback() {
+    this.shadowRoot.querySelector("button").addEventListener("click", this.#redirect);
+  }
+
+  disconnectedCallback() {
+    this.shadowRoot.querySelector("button").removeEventListener("click", this.#redirect);
+  }
+
+  #redirect() {
+    window.location.href = "/api/login";
   }
 
 }

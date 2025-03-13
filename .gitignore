@@ -9,3 +9,4 @@
 *.sln
 *.sw?
 db-queries.txt
+api/client_secret.json

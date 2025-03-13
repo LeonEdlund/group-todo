@@ -13,13 +13,11 @@ class Database
    */
   public function __construct()
   {
-    $config = require 'config/config.php';
-
     try {
       $this->connection = new PDO(
-        $config['dsn'],
-        $config['username'],
-        $config['pwd'],
+        $_ENV["DB_DSN"],
+        $_ENV["DB_USERNAME"],
+        $_ENV["DB_PASSWORD"],
         [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ]
       );
     } catch (PDOException $e) {
@@ -43,43 +41,48 @@ class Database
     return $stmt;
   }
 
-  /** 
-   * Returns a string of the last inserted id. 
-   * 
-   * @return String
-   */
-  public function lastInsertId()
+  public function upsert_user($idToken)
   {
-    return $this->connection->lastInsertId();
+    $query = 'INSERT INTO users (google_id, display_name, profile_url) VALUES (:google_id, :display_name, :profile_url) ON DUPLICATE KEY UPDATE display_name = :display_name, profile_url = :profile_url;';
+
+    $this->query($query, [":google_id" => $idToken["sub"], ":display_name" => $idToken["name"], ":profile_url" => $idToken["picture"]]);
+
+    return $this->query("SELECT * FROM users WHERE google_id = :google_id", [":google_id" => $idToken["sub"]])->fetch();
   }
+
+  /** 
+   * __________________
+   * PROJECT
+   * __________________
+   */
 
   /** 
    * Returns all projects
    * 
    * @return Object
    */
-  public function getAllProjects()
+  public function getAllProjects($id)
   {
     $query = "SELECT 
     projects.project_id,
     projects.title,
     projects.cover_svg AS img,
     projects.created_at,
-    CONCAT(owner.first_name, ' ', owner.last_name) AS owner,
-    JSON_ARRAYAGG(
-    JSON_OBJECT('name', CONCAT(members.first_name, ' ', members.last_name))) AS members,
+    owner.display_name AS owner,
+    JSON_ARRAYAGG(JSON_OBJECT('name', members.display_name)) AS members,
     CASE 
       WHEN COUNT(tasks.task_id) = 0 THEN 0 
-      ELSE (SUM(CASE WHEN tasks.completion_status = 'completed' THEN 1 ELSE 0 END) * 100.0 / COUNT(tasks.task_id))
+      ELSE (SUM(CASE WHEN tasks.completed_by IS NOT NULL THEN 1 ELSE 0 END) * 100.0 / COUNT(tasks.task_id))
     END AS progress_percentage
     FROM projects
     INNER JOIN users AS owner ON projects.owner_id = owner.user_id
     LEFT JOIN project_members ON project_members.project_id = projects.project_id
     LEFT JOIN users AS members ON project_members.user_id = members.user_id
     LEFT JOIN tasks ON tasks.project_id = projects.project_id
+    WHERE projects.owner_id = :id OR members.user_id = :id
     GROUP BY projects.project_id ORDER BY projects.project_id DESC;";
 
-    return $this->query($query)->fetchAll();
+    return $this->query($query, ["id" => $id])->fetchAll();
   }
 
   /** 
@@ -88,30 +91,61 @@ class Database
    * @param string - id of the project
    * @return Object
    */
-  public function getProject($id)
+  public function getProject($projectId, $userId)
   {
     $query = "SELECT 
     projects.project_id,
     projects.title,
     projects.cover_svg AS img,
     projects.created_at,
-    CONCAT(owner.first_name, ' ', owner.last_name) AS owner,
-    JSON_ARRAYAGG(
-    JSON_OBJECT('name', CONCAT(members.first_name, ' ', members.last_name))) AS members,
+    owner.display_name AS owner,
+    JSON_ARRAYAGG(JSON_OBJECT('name', members.display_name)) AS members,
     CASE 
-    WHEN COUNT(tasks.task_id) = 0 THEN 0 
-    ELSE (SUM(CASE WHEN tasks.completion_status = 'completed' THEN 1 ELSE 0 END) * 100.0 / COUNT(tasks.task_id))
+      WHEN COUNT(tasks.task_id) = 0 THEN 0 
+      ELSE (SUM(CASE WHEN tasks.completed_by IS NOT NULL THEN 1 ELSE 0 END) * 100.0 / COUNT(tasks.task_id))
     END AS progress_percentage
     FROM projects
     INNER JOIN users AS owner ON projects.owner_id = owner.user_id
     LEFT JOIN project_members ON project_members.project_id = projects.project_id
     LEFT JOIN users AS members ON project_members.user_id = members.user_id
     LEFT JOIN tasks ON tasks.project_id = projects.project_id
-    WHERE projects.project_id = :id
+    WHERE projects.project_id = :project_id AND (projects.owner_id = :user_id OR members.user_id = :user_id)
     GROUP BY projects.project_id ORDER BY projects.project_id DESC;";
 
-    return $this->query($query, [":id" => $id])->fetch();
+    return $this->query($query, [":project_id" => $projectId, ":user_id" => $userId])->fetch();
   }
+
+  public function insertProject($title, $owner, $svg)
+  {
+    $query = "INSERT INTO `projects` (`owner_id`, `title`, `cover_svg`) VALUES (:owner_id, :title, :svg);";
+    $this->query($query, [":owner_id" => $owner, ":title" => $title, ":svg" => $svg]);
+
+    return ["id" => $this->lastInsertId()];
+  }
+
+  public function insertMember($userId, $projectId)
+  {
+    $query = "INSERT INTO `project_members` (`user_id`, `project_id`) VALUES (`:user_id`, `:project_id`)";
+
+    return $this->query($query, [":user_id" => $userId, ":project_id" => $projectId]);
+  }
+
+  public function getTotalScore($projectId)
+  {
+    $query = "SELECT users.profile_url, users.display_name, IFNULL(SUM(tasks.score), 0) AS total_score FROM users LEFT JOIN tasks ON tasks.completed_by = users.user_id AND tasks.project_id = :project_id WHERE users.user_id IN (
+    SELECT project_members.user_id FROM project_members WHERE project_members.project_id = :project_id
+    UNION 
+    SELECT projects.owner_id FROM projects WHERE projects.project_id = :project_id) 
+    GROUP BY users.user_id, users.display_name;";
+
+    return $this->query($query, [":project_id" => $projectId])->fetchAll();
+  }
+
+  /** 
+   * __________________
+   * TASKS
+   * __________________
+   */
 
   /** 
    * Returns all tasks related to a project
@@ -125,41 +159,75 @@ class Database
     tasks.task_id,
     tasks.title,
     tasks.description_text,
-    tasks.difficulty_level,
-    completion_status,
-    CONCAT(users.first_name, ' ', users.last_name) AS assigned_to
+    tasks.score,
+    users.display_name AS completed_by
     FROM tasks
-    INNER JOIN users ON tasks.assigned_to = users.user_id
+    LEFT JOIN users ON tasks.completed_by = users.user_id
     WHERE tasks.project_id = :id
-    GROUP BY tasks.task_id ORDER BY tasks.created_at DESC;";
+    ORDER BY tasks.created_at DESC;";
 
     return $this->query($query, [":id" => $id])->fetchAll();
   }
 
-  public function insertProject($title, $owner, $svg)
+  public function insertTask($id, $args)
   {
-    $query = "INSERT INTO `projects` (`owner_id`, `title`, `cover_svg`) VALUES (:owner_id, :title, :svg);";
-    $this->query($query, [":owner_id" => $owner, ":title" => $title, ":svg" => $svg]);
+    $query = "INSERT INTO `tasks` (`project_id`, `title`, `description_text`, `score`) VALUES (:project_id, :title, :description_text, :score)";
+
+    $this->query($query, [":project_id" => $id, ":title" => $args["title"], ":description_text" => $args["description"],  ":score" => $args["score"]]);
 
     return ["id" => $this->lastInsertId()];
   }
 
-
-  public function insertTask($args)
+  public function completeTask($projectId, $taskId, $user)
   {
-    $query = "INSERT INTO `tasks` (`project_id`, `assigned_to`, `title`, `description_text`, `difficulty_level`) VALUES (:project_id, :assigned_to, :title, :description_text, :difficulty_level)";
+    $query = "UPDATE tasks SET tasks.completed_by = :user WHERE tasks.project_id = :project_id AND tasks.task_id = :task_id";
 
-    $this->query($query, [":project_id" => $args["projectId"], ":assigned_to" => $args["assignedTo"], ":title" => $args["title"], ":description_text" => $args["description"],  ":difficulty_level" => $args["difficulty"]]);
+    $this->query($query, [":user" => $user, ":project_id" => $projectId, ":task_id" => $taskId]);
 
-    return ["id" => $this->lastInsertId()];
+    $progress = $this->getProgress($projectId);
+
+    return ["project" => $projectId, "completed" => "{$progress->progress_percentage}%"];
   }
 
-  public function updateTaskCompletionStatus($id, $status)
+  public function uncompleteTask($projectId, $taskId)
   {
-    $query = "UPDATE tasks SET tasks.completion_status = :completion_status WHERE tasks.task_id = :id";
+    $query = "UPDATE tasks SET tasks.completed_by = null WHERE tasks.project_id = :project_id AND tasks.task_id = :task_id";
 
-    $this->query($query, [":completion_status" => $status, ":id" => $id]);
+    $this->query($query, [":project_id" => $projectId, ":task_id" => $taskId]);
 
-    return ["id" => $id, "status" => $status];
+    $progress = $this->getProgress($projectId);
+
+    return ["project" => $projectId, "completed" => "{$progress->progress_percentage}%"];
+  }
+
+  /** 
+   * __________________
+   * UTILS
+   * __________________
+   */
+
+  private function getProgress($projectId)
+  {
+    $query = "SELECT 
+    CASE 
+      WHEN COUNT(tasks.task_id) = 0 THEN 0 
+      ELSE (SUM(CASE WHEN tasks.completed_by IS NOT NULL THEN 1 ELSE 0 END) * 100.0 / COUNT(tasks.task_id))
+    END AS progress_percentage
+    FROM projects
+    LEFT JOIN tasks ON tasks.project_id = projects.project_id
+    WHERE projects.project_id = :project_id
+    GROUP BY projects.project_id;";
+
+    return $this->query($query, [":project_id" => $projectId])->fetch();
+  }
+
+  /** 
+   * Returns a string of the last inserted id. 
+   * 
+   * @return String
+   */
+  public function lastInsertId()
+  {
+    return $this->connection->lastInsertId();
   }
 }

@@ -8,8 +8,9 @@ class TaskContainer extends HTMLElement {
   #completed;
   #arrowBtn;
   #checkbox;
+  #descriptionWrapper;
 
-  static observedAttributes = ["title", "assigned", "difficulty", "description", "completed"];
+  static observedAttributes = ["title", "score", "description", "completed-by"];
 
   constructor() {
     super();
@@ -18,9 +19,9 @@ class TaskContainer extends HTMLElement {
     addStylesheetToShadowRoot(style, this.shadowRoot);
 
     this.#expanded = false;
-    this.#completed = false;
     this.#arrowBtn = this.shadowRoot.getElementById("arrow-btn");
     this.#checkbox = this.shadowRoot.getElementById("ch1");
+    this.#descriptionWrapper = this.shadowRoot.getElementById("description-wrapper");
   }
 
   connectedCallback() {
@@ -28,8 +29,9 @@ class TaskContainer extends HTMLElement {
     this.#checkbox.onclick = () => { this.toggleCheckbox() };
   }
 
-  disconectedCallback() {
+  disconnectedCallback() {
     this.#arrowBtn.onclick = null;
+    this.#checkbox.onclick = null;
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -38,63 +40,66 @@ class TaskContainer extends HTMLElement {
         const title = this.getAttribute("title") || "Title";
         this.shadowRoot.querySelector("#task-title").innerText = title;
         break;
-      case "assigned":
-        const assigned = this.getAttribute("assigned") || "Nobody is assigned";
-        this.shadowRoot.getElementById("assigned").innerText = assigned;
-        break;
-      case "difficulty":
-        const difficulty = this.getAttribute("difficulty") || "Nobody is assigned";
-        this.shadowRoot.getElementById("difficulty").innerText = difficulty;
-        break;
       case "description":
         const description = this.getAttribute("description") || "No description";
         this.shadowRoot.getElementById("description").innerText = description;
         break;
-      case "completed":
-        const completed = this.getAttribute("completed") || "not completed";
+      case "score":
+        const score = this.getAttribute("score");
+        this.shadowRoot.getElementById("assigned").innerText = `Points: ${score}`;
+        break;
+      case "completed-by":
+        this.#completed = true;
 
-        if (completed === "completed") {
-          this.#checkbox.checked = true;
-          this.#completed = true;
-        } else {
-          this.#checkbox.checked = false;
-          this.#completed = false;
-        }
+        // create completed by section
+        const completedTitle = document.createElement("p");
+        completedTitle.innerText = "Completed By";
+        const name = document.createElement("i");
+        name.innerText = this.getAttribute("completed-by")
+        completedTitle.appendChild(name);
+        this.#descriptionWrapper.append(completedTitle, name);
+
+        //Fill checkbox
+        this.#checkbox.checked = true;
 
         break;
     }
   }
 
   expand() {
-    const descriptionWrapper = this.shadowRoot.getElementById("description-wrapper");
-
     if (!this.#expanded) {
       this.#expanded = true;
       this.#arrowBtn.style.transform = "rotate(-180deg)";
-      descriptionWrapper.classList.add("expanded");
+      this.#descriptionWrapper.classList.add("expanded");
     } else if (this.#expanded) {
       this.#expanded = false;
       this.#arrowBtn.style.transform = "rotate(0deg)";
-      descriptionWrapper.classList.remove("expanded");
+      this.#descriptionWrapper.classList.remove("expanded");
     }
   }
 
   async toggleCheckbox() {
+    const projectId = this.getAttribute("project-id");
     const id = this.getAttribute("id");
+    let progress;
+
     if (!this.#completed) {
-      console.log(this.getAttribute("id"))
-      this.setAttribute("completed", "completed");
+      progress = await uploadJSON(`/api/project/${projectId}/tasks/${id}/completed`, "PATCH");
+      this.#completed = true;
     } else {
-      this.setAttribute("completed", "not completed");
+      progress = await uploadJSON(`/api/project/${projectId}/tasks/${id}/uncompleted`, "PATCH");
+      this.#completed = false;
     }
 
-    const response = await uploadJSON("/api/task/update-completion", "PATCH", {
-      id: id,
-      status: this.getAttribute("completed"),
-      //add user id
+    const taskToggled = new CustomEvent("taskToggled", {
+      bubbles: true,
+      composed: true,
+      detail: {
+        progress: progress
+      }
     });
-    console.log(response)
 
+    this.dispatchEvent(taskToggled);
   }
 }
 

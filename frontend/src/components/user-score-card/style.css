@@ -1,0 +1,33 @@
+@import url(../../styles/shared-styles.css);
+
+#wrapper,
+#user {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--color-text);
+}
+
+#wrapper {
+  padding: 0.5em 1em;
+  background-color: var(--color-primary);
+  border-radius: 5px;
+  margin-top: 0.9rem;
+}
+
+#user {
+  gap: 0.8rem;
+}
+
+h3 {
+  font-size: var(--font-heading-2);
+}
+
+p {
+  font-size: var(--font-small);
+}
+
+img {
+  border-radius: 50%;
+  max-width: 45px;
+}

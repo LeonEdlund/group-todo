@@ -2,7 +2,7 @@ import template from "./template";
 import style from "./style.css?inline";
 import threeDotsImg from "../../resources/three-dots.svg";
 import { addStylesheetToShadowRoot } from "../../utils/style-manipulation";
-import { SvgGenerator } from "../../classes/SvgGenerator";
+import generateSvg from "../../utils/generateSvg";
 
 class ProjectCard extends HTMLElement {
   static observedAttributes = ["title", "created", "progress", "cover_img"];
@@ -33,7 +33,7 @@ class ProjectCard extends HTMLElement {
         this.shadowRoot.querySelector("progress-bar").setAttribute("completed", progress);
         break;
       case "cover_img":
-        const coverImg = this.getAttribute("cover_img") || SvgGenerator.generateSvg().outerHTML
+        const coverImg = this.getAttribute("cover_img") || generateSvg().outerHTML;
         this.shadowRoot.querySelector(".img-container").innerHTML = coverImg;
         break;
     }

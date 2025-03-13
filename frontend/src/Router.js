@@ -1,8 +1,8 @@
 import Router from "vanilla-router";
+import isAuthenticated from "./utils/isAuthenticated";
 import { gsap } from "gsap";
 
 const app = document.getElementById("app");
-const secondScreen = document.getElementById("second-screen");
 
 export var router = new Router({
   mode: 'history',
@@ -12,19 +12,45 @@ export var router = new Router({
   }
 });
 
-router.add('', function () {
+router.add('', async function () {
+  const user = await isAuthenticated();
+
+  if (!user) {
+    router.navigateTo("/login");
+    return;
+  }
+
   app.innerHTML = "";
   const homeView = document.createElement("home-view");
-  app.appendChild(homeView);
+  const navBar = document.createElement("nav-footer");
+  console.log(user);
+  navBar.setAttribute("profile-pic", user.profile_url);
+  app.append(homeView, navBar);
 });
 
-router.add('project/(:num)', function (id) {
+router.add('project/(:num)', async function (id) {
+  const user = await isAuthenticated();
+  if (!user) {
+    router.navigateTo("/login");
+    return;
+  }
+
+  // get data 
   app.innerHTML = "";
   const projectView = document.createElement("project-view");
+  projectView.projectId = id;
   app.appendChild(projectView);
+
 });
 
-router.add("login", function () {
+router.add("login", async function () {
+  const user = await isAuthenticated();
+
+  if (user) {
+    router.navigateTo("/");
+    return;
+  }
+
   app.innerHTML = "";
   const loginView = document.createElement("login-view");
   app.appendChild(loginView);

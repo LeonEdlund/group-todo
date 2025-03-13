@@ -1,7 +1,7 @@
 import template from "./template";
 import style from "./style.css?inline";
 import { addStylesheetToShadowRoot } from "../../utils/style-manipulation";
-import { SvgGenerator } from "../../classes/SvgGenerator";
+import generateSvg from "../../utils/generateSvg";
 import { uploadJSON } from "../../utils/api";
 import { router } from "../../Router"
 
@@ -32,7 +32,7 @@ class UploadField extends HTMLElement {
     const response = await uploadJSON("/api/add-project", "POST", {
       title: this.shadowRoot.querySelector("input").value,
       owner: "1",
-      svg: SvgGenerator.generateSvg().outerHTML
+      svg: generateSvg().outerHTML
     });
 
     if (response.id) {

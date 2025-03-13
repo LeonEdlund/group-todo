@@ -11,25 +11,30 @@ template.innerHTML = `
 
 
     <div class="btn-container">
-      <div class="round-decoration"></div>
-      <div class="round-decoration"></div>
-      <button id="add-task">+</button>
-      <div class="round-decoration"></div>
-      <div class="round-decoration"></div>
+      <button class="round-decoration" id="open-score"><ion-icon name="trophy-outline"></ion-icon></button>
+      <button id="add-task"><ion-icon name="add-outline"></ion-icon></button>
+      <div class="round-decoration" id="share"><ion-icon name="person-add-outline"></ion-icon></ion-icon></div>
     </div>
 
 
     <div id="tasks-wrapper">
     </div>
 
-    <dialog>
+    <dialog id="add-task-modal">
+      <div class="header">
+        <h2>Create Task</h2>
+        <button class="closeBtn" id="close-task-modal">X</button>
+      </div>
       <form-add-task></form-add-task>
-    </dialog>     
-    `;
+    </dialog>
+    
+    <dialog id="scores-modal">
+      <div class="header">
+        <h2>Scoreboard</h2>
+        <button class="closeBtn" id="close-scores">X</button>
+      </div>
 
-// <project-card title="My First Group Project" created="26/02-25" progress="70%">
-//   <li slot="member-list-item"><i>Leon Edlund</i></li>
-//   <li slot="member-list-item"><i>Theo Myrvold</i></li>
-//   <li slot="member-list-item"><i>Jesper Milton</i></li>
-//   <li slot="member-list-item"><i>+2</i></li>
-// </project-card>
+      <div id="score-wrapper">
+      </div>
+    </dialog>
+    `;

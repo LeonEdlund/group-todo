@@ -1,8 +1,6 @@
 import template from "./template";
 import style from "./style.css?inline";
 import { addStylesheetToShadowRoot } from "../../utils/style-manipulation";
-import { router } from "../../Router";
-import { uploadJSON } from "../../utils/api";
 
 class FormAddTask extends HTMLElement {
   #projectId;
@@ -14,8 +12,6 @@ class FormAddTask extends HTMLElement {
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
     addStylesheetToShadowRoot(style, this.shadowRoot);
-
-    this.#projectId = location.pathname.split("/").pop();
   }
 
   connectedCallback() {
@@ -28,32 +24,36 @@ class FormAddTask extends HTMLElement {
 
   attributeChangedCallback(name) {
     if (name === "project-id") {
-      const id = this.getAttribute("project-id");
-      if (!isNaN(id)) {
-        this.#projectId = id;
-      }
+      this.#projectId = this.getAttribute("project-id");
     }
   }
 
   async #submitTask(event) {
     event.preventDefault();
-
     const form = this.shadowRoot.querySelector("form");
     const formData = new FormData(form);
     const formObject = Object.fromEntries(formData.entries());
 
-    const response = await uploadJSON("/api/add-task", "POST", {
-      projectId: this.#projectId,
-      title: formObject.title,
-      description: formObject.description,
-      difficulty: formObject.difficulty,
-      assignedTo: formObject["assigned-too"]
-    });
+    const response = await fetch(`/api/project/${this.#projectId}/tasks`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: formObject.title,
+          description: formObject.description,
+          score: formObject.score
+        })
 
-    const taskAddedEvent = new CustomEvent("taskAdded");
-    this.dispatchEvent(taskAddedEvent);
-    console.log(response);
-    //router.back();
+      });
+
+    if (response.ok) {
+      const taskAddedEvent = new CustomEvent("taskAdded");
+      this.dispatchEvent(taskAddedEvent);
+    } else {
+      console.log("Something went wrong when uploading task");
+    }
   }
 
 }

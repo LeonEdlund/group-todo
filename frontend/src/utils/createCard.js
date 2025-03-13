@@ -9,6 +9,8 @@ export default function createCard(project) {
   card.setAttribute("cover_img", project.img);
   card.setAttribute("progress", `${project.progress_percentage}%`);
 
+  console.log(card)
+
   const owner = document.createElement("li");
   owner.setAttribute("slot", "member-list-item");
   const wrapper = document.createElement("i");

@@ -9,7 +9,7 @@ export default function createCard(project) {
   card.setAttribute("title", project.title);
   card.setAttribute("created", createdAt);
   card.setAttribute("cover_img", project.img);
-  card.setAttribute("progress", `${project.progress_percentage}%`);
+  card.setAttribute("progress", `${project.progress}%`);
 
   let membersElems = [];
   for (let i = 0; i < 3; i++) {

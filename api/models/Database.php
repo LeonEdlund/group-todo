@@ -87,12 +87,7 @@ class Database
     return array_values($projectsById);
   }
 
-  private function getMembers($projectId)
-  {
-    $query = "SELECT users.display_name FROM webb6_project_members AS members INNER JOIN webb6_users AS users ON members.user_id = users.user_id WHERE members.project_id = :project_id";
 
-    return $this->query($query, ["project_id" => $projectId])->fetchAll();
-  }
 
   /** 
    * Returns a single project
@@ -102,26 +97,21 @@ class Database
    */
   public function getProject($projectId, $userId)
   {
-    $query = "SELECT 
-    projects.project_id,
-    projects.title,
-    projects.cover_svg AS img,
-    projects.created_at,
-    owner.display_name AS owner,
-    JSON_ARRAYAGG(JSON_OBJECT('name', members.display_name)) AS members,
-    CASE 
-      WHEN COUNT(tasks.task_id) = 0 THEN 0 
-      ELSE (SUM(CASE WHEN tasks.completed_by IS NOT NULL THEN 1 ELSE 0 END) * 100.0 / COUNT(tasks.task_id))
-    END AS progress_percentage
-    FROM webb6_projects AS projects
-    INNER JOIN webb6_users AS owner ON projects.owner_id = owner.user_id
-    LEFT JOIN webb6_project_members AS project_members ON project_members.project_id = projects.project_id
-    LEFT JOIN webb6_users AS members ON project_members.user_id = members.user_id
-    LEFT JOIN webb6_tasks AS tasks ON tasks.project_id = projects.project_id
-    WHERE projects.project_id = :project_id AND (projects.owner_id = :user_id OR members.user_id = :user_id)
-    GROUP BY projects.project_id ORDER BY projects.project_id DESC;";
+    $basicInfoquery = "SELECT 
+    p.project_id,
+    p.title,
+    p.cover_svg AS img,
+    p.created_at
+    FROM webb6_projects AS p
+    INNER JOIN webb6_project_members AS m ON p.project_id = m.project_id
+    WHERE m.user_id = :user_id AND p.project_id = :project_id
+    ORDER BY p.created_at DESC;";
 
-    return $this->query($query, [":project_id" => $projectId, ":user_id" => $userId])->fetch();
+    $project = $this->query($basicInfoquery, [":project_id" => $projectId, ":user_id" => $userId])->fetch();
+    $project->progress = $this->getProgress($projectId)->progress_percentage;
+    $project->members = $this->getMembers($projectId);
+
+    return $project;
   }
 
   public function insertProject($title, $owner, $svg)
@@ -130,6 +120,19 @@ class Database
     $this->query($query, [":owner_id" => $owner, ":title" => $title, ":svg" => $svg]);
 
     return ["id" => $this->lastInsertId()];
+  }
+
+  /** 
+   * __________________
+   * MEMBERS
+   * __________________
+   */
+
+  private function getMembers($projectId)
+  {
+    $query = "SELECT users.display_name FROM webb6_project_members AS members INNER JOIN webb6_users AS users ON members.user_id = users.user_id WHERE members.project_id = :project_id";
+
+    return $this->query($query, ["project_id" => $projectId])->fetchAll();
   }
 
   public function insertMember($userId, $projectId)

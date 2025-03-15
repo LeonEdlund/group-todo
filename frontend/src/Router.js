@@ -24,7 +24,6 @@ router.add('', async function () {
   app.innerHTML = "";
   const homeView = document.createElement("home-view");
   const navBar = document.createElement("nav-footer");
-  console.log(user);
   navBar.setAttribute("profile-pic", user.profile_url);
   app.append(homeView, navBar);
 });

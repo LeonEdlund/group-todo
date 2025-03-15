@@ -4,6 +4,7 @@ import { addStylesheetToShadowRoot } from "../../utils/style-manipulation";
 import generateSvg from "../../utils/generateSvg";
 import { uploadJSON } from "../../utils/api";
 import { router } from "../../Router"
+import basePath from "../../utils/basePath";
 
 class UploadField extends HTMLElement {
   constructor() {
@@ -29,7 +30,7 @@ class UploadField extends HTMLElement {
       return;
     };
 
-    const response = await uploadJSON("/api/add-project", "POST", {
+    const response = await uploadJSON(`${basePath}/api/add-project`, "POST", {
       title: this.shadowRoot.querySelector("input").value,
       owner: "1",
       svg: generateSvg().outerHTML

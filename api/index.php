@@ -22,7 +22,7 @@ $app = new \Slim\App($config);
 
 $client = new Google\Client();
 $client->setAuthConfig('client_secret.json');
-$client->setRedirectUri($_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . '/to-do/api/auth/callback');
+$client->setRedirectUri($_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_ENV["AUTH_REDIRECT_CALLBACK"]);
 $client->setScopes('openid email profile');
 
 $db = new Database();
@@ -127,15 +127,15 @@ $app->get("/project/{id:\d+}/scores", function ($req, $res, $args) {
 // Specific project - Returns a post based on id 
 $app->get("/project/{id:\d+}/join", function ($req, $res, $args) {
   if (!isset($_SESSION['user'])) {
-    $_SESSION["redirect_path_after_login"] = "{$_ENV['REROUTE_PATH']}/project/{$args['id']}";
-    return $res->withRedirect("/login", 301);
+    $_SESSION["redirect_path_after_login"] = "{$_ENV['REROUTE_PATH']}project/{$args['id']}";
+    return $res->withRedirect("{$_ENV['REROUTE_PATH']}login", 301);
   }
 
   global $db;
 
   $db->insertMember($_SESSION["user"]->user_id, $args["id"]);
 
-  return $res->withRedirect("{$_ENV['REROUTE_PATH']}/project/{$args['id']}", 301);
+  return $res->withRedirect("{$_ENV['REROUTE_PATH']}project/{$args['id']}", 301);
 });
 
 /** 
@@ -189,5 +189,10 @@ $app->post("/add-project", function ($req, $res, $args) {
   $id = $db->insertProject($input["title"], $_SESSION["user"]->user_id, $input["svg"]);
   return $res->withJson($id);
 })->add($authenticate);
+
+$app->get("/test", function ($req, $res, $args) {
+  echo $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_ENV["AUTH_REDIRECT_CALLBACK"];
+});
+
 
 $app->run();

@@ -5,6 +5,7 @@ import { router } from "../../Router";
 import { getData } from "../../utils/api";
 import createCard from "../../utils/createCard";
 import createTask from "../../utils/createTask";
+import basePath from "../../utils/basePath";
 
 class ProjectView extends HTMLElement {
   #id;
@@ -55,7 +56,7 @@ class ProjectView extends HTMLElement {
 
     this.#addEventlisteners();
 
-    const cardData = await getData(`/api/project/${this.#id}`);
+    const cardData = await getData(`${basePath}/api/project/${this.#id}`);
     const tasks = await this.#fetchTasks();
     this.#createTask(tasks);
     this.#updateCard(cardData);
@@ -101,7 +102,7 @@ class ProjectView extends HTMLElement {
 
   async #fetchTasks() {
     this.#taskWrapper.innerHTML = "Loading...";
-    return await getData(`/api/project/${this.#id}/tasks`);
+    return await getData(`${basePath}/api/project/${this.#id}/tasks`);
   }
 
   #createTask(tasks) {
@@ -128,7 +129,7 @@ class ProjectView extends HTMLElement {
 
   async loadScores() {
     const scoreWrapper = this.#scoresModal.querySelector("#score-wrapper");
-    const scores = await getData(`/api/project/${this.#id}/scores`);
+    const scores = await getData(`${basePath}/api/project/${this.#id}/scores`);
 
     if (!scores) return;
 

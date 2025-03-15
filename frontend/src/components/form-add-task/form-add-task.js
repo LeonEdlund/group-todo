@@ -1,6 +1,7 @@
 import template from "./template";
 import style from "./style.css?inline";
 import { addStylesheetToShadowRoot } from "../../utils/style-manipulation";
+import basePath from "../../utils/basePath";
 
 class FormAddTask extends HTMLElement {
   #projectId;
@@ -34,7 +35,7 @@ class FormAddTask extends HTMLElement {
     const formData = new FormData(form);
     const formObject = Object.fromEntries(formData.entries());
 
-    const response = await fetch(`/api/project/${this.#projectId}/tasks`,
+    const response = await fetch(`${basePath}/api/project/${this.#projectId}/tasks`,
       {
         method: "POST",
         headers: {

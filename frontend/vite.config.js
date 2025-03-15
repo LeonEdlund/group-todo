@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
+  base: "/~le223nd/webbteknik-6/to-do-app/",
   server: {
     proxy: {
       '/api': {

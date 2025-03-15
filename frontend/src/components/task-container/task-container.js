@@ -2,6 +2,7 @@ import template from "./template";
 import style from "./style.css?inline";
 import { addStylesheetToShadowRoot } from "../../utils/style-manipulation";
 import { uploadJSON } from "../../utils/api";
+import basePath from "../../utils/basePath";
 
 class TaskContainer extends HTMLElement {
   #expanded;
@@ -84,10 +85,10 @@ class TaskContainer extends HTMLElement {
     let progress;
 
     if (!this.#completed) {
-      progress = await uploadJSON(`/api/project/${projectId}/tasks/${id}/completed`, "PATCH");
+      progress = await uploadJSON(`${basePath}/api/project/${projectId}/tasks/${id}/completed`, "PATCH");
       this.#completed = true;
     } else {
-      progress = await uploadJSON(`/api/project/${projectId}/tasks/${id}/uncompleted`, "PATCH");
+      progress = await uploadJSON(`${basePath}/api/project/${projectId}/tasks/${id}/uncompleted`, "PATCH");
       this.#completed = false;
     }
 

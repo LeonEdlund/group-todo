@@ -4,6 +4,7 @@ import { addStylesheetToShadowRoot } from "../../utils/style-manipulation";
 import { router } from "../../Router";
 import { getData } from "../../utils/api";
 import createCard from "../../utils/createCard";
+import basePath from "../../utils/basePath";
 
 class ProjectList extends HTMLElement {
   #itemWrapper;
@@ -29,7 +30,7 @@ class ProjectList extends HTMLElement {
   }
 
   async #fetchData() {
-    const data = await getData("/api/projects");
+    const data = await getData(`${basePath}/api/projects`);
     return data;
   }
 

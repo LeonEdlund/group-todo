@@ -1,6 +1,7 @@
 import template from "./template";
 import style from "./style.css?inline";
 import { addStylesheetToShadowRoot } from "../../utils/style-manipulation";
+import basePath from "../../utils/basePath";
 
 class NavFooter extends HTMLElement {
   static observedAttributes = ["profile-pic"]
@@ -23,7 +24,7 @@ class NavFooter extends HTMLElement {
   }
 
   #logout() {
-    window.location.href = "/api/logout";
+    window.location.href = `${basePath}/api/logout`;
   }
 }
 

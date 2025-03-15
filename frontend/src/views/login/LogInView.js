@@ -1,6 +1,7 @@
 import template from "./template";
 import style from "./style.css?inline";
 import { addStylesheetToShadowRoot } from "../../utils/style-manipulation";
+import basePath from "../../utils/basePath";
 
 class LogInView extends HTMLElement {
   constructor() {
@@ -19,7 +20,7 @@ class LogInView extends HTMLElement {
   }
 
   #redirect() {
-    window.location.href = "/api/login";
+    window.location.href = `${basePath}/api/login`;
   }
 
 }

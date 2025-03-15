@@ -6,6 +6,7 @@ const app = document.getElementById("app");
 
 export var router = new Router({
   mode: 'history',
+  root: '/~le223nd/webbteknik-6/to-do-app',
   page404: function (path) {
     app.innerHTML = "<h1>page not found</h1>";
     console.log('"/' + path + '" Page not found');

@@ -108,8 +108,10 @@ class Database
     ORDER BY p.created_at DESC;";
 
     $project = $this->query($basicInfoquery, [":project_id" => $projectId, ":user_id" => $userId])->fetch();
-    $project->progress = $this->getProgress($projectId)->progress_percentage;
-    $project->members = $this->getMembers($projectId);
+    if ($project) {
+      $project->progress = $this->getProgress($projectId)->progress_percentage;
+      $project->members = $this->getMembers($projectId);
+    }
 
     return $project;
   }
@@ -177,7 +179,7 @@ class Database
    * @param string - id of the project
    * @return Object
    */
-  public function getTasks($id)
+  public function getTasks($id, $userId)
   {
     $query = "SELECT 
     tasks.task_id,
@@ -187,10 +189,11 @@ class Database
     users.display_name AS completed_by
     FROM webb6_tasks AS tasks
     LEFT JOIN webb6_users AS users ON tasks.completed_by = users.user_id
-    WHERE tasks.project_id = :id
+    INNER JOIN webb6_project_members AS members ON tasks.project_id = members.project_id
+    WHERE tasks.project_id = :id AND members.user_id = :user_id
     ORDER BY tasks.created_at DESC;";
 
-    return $this->query($query, [":id" => $id])->fetchAll();
+    return $this->query($query, [":id" => $id, ":user_id" => $userId])->fetchAll();
   }
 
   public function insertTask($id, $args)

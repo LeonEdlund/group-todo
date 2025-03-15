@@ -1,6 +1,7 @@
 import Router from "vanilla-router";
 import isAuthenticated from "./utils/isAuthenticated";
 import { gsap } from "gsap";
+import basePath from "./utils/basePath";
 
 const app = document.getElementById("app");
 
@@ -43,6 +44,10 @@ router.add('project/(:num)', async function (id) {
 
 });
 
+router.add('project/(:num)/join', async function (id) {
+  window.location.href = `${window.location.origin}${basePath}/api/project/${id}/join`;
+});
+
 router.add("login", async function () {
   const user = await isAuthenticated();
 
@@ -55,6 +60,7 @@ router.add("login", async function () {
   const loginView = document.createElement("login-view");
   app.appendChild(loginView);
 });
+
 
 router.addUriListener();
 router.check();

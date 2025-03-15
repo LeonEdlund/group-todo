@@ -10,12 +10,9 @@ import ModalHandler from "../../utils/ModalHandler";
 
 class ProjectView extends HTMLElement {
   #id;
-  //BUTTONS
+  #btnContainer
   #backBtn;
-  #addBtn;
-  #scoreBtn;
-  #shareBtn;
-  // ELEMENTS
+  #copyShareLink;
   #cardWrapper;
   #card;
   #taskWrapper;
@@ -42,11 +39,13 @@ class ProjectView extends HTMLElement {
   //--------------------------------------------------------------------------
 
   async connectedCallback() {
+    // BUTTONS
+    this.#btnContainer = this.shadowRoot.getElementById("btn-container");
     this.#backBtn = this.shadowRoot.getElementById("back-btn");
-    this.#addBtn = this.shadowRoot.getElementById("add-task");
-    this.#scoreBtn = this.shadowRoot.getElementById("open-score");
-    this.#taskWrapper = this.shadowRoot.getElementById("tasks-wrapper");
+
+    // ELEMENTS
     this.#cardWrapper = this.shadowRoot.getElementById("card-wrapper");
+    this.#taskWrapper = this.shadowRoot.getElementById("tasks-wrapper");
     this.#form = this.shadowRoot.querySelector("form-add-task");
     this.#form.setAttribute("project-id", this.#id);
 
@@ -62,23 +61,40 @@ class ProjectView extends HTMLElement {
   bindMethods() {
     this.taskAdded = this.taskAdded.bind(this);
     this.loadScores = this.loadScores.bind(this);
+    this.shareModalInit = this.shareModalInit.bind(this);
   }
 
   #registerModals() {
     ModalHandler.register("score-modal", this.shadowRoot.getElementById("scores-modal"), this.loadScores);
     ModalHandler.register("add-task-modal", this.shadowRoot.getElementById("add-task-modal"));
-    ModalHandler.register("share-modal", this.shadowRoot.getElementById("share-modal"));
+    ModalHandler.register("share-modal", this.shadowRoot.getElementById("share-modal"), this.shareModalInit);
   }
 
   #addEventlisteners() {
+    this.#btnContainer.addEventListener("click", this.#handleModalBtns);
     this.#backBtn.onclick = () => router.navigateTo("/");
-    this.#addBtn.onclick = () => { ModalHandler.open("add-task-modal"); };
-    this.#scoreBtn.onclick = async () => { ModalHandler.open("score-modal"); };
 
     this.#form.addEventListener("taskAdded", this.taskAdded);
     this.#taskWrapper.addEventListener("taskToggled", (e) => {
-      this.#card.setAttribute("progress", e.detail.progresscompleted);
+      this.#card.setAttribute("progress", e.detail.progress.completed);
     });
+  }
+
+  #handleModalBtns(event) {
+    const pressedBtn = event.target.closest("button");
+    if (!pressedBtn) return;
+
+    const btnId = pressedBtn.id;
+
+    const cases = {
+      "open-score": () => ModalHandler.open("score-modal"),
+      "add-task": () => ModalHandler.open("add-task-modal"),
+      "open-share": () => ModalHandler.open("share-modal"),
+    }
+
+    const btnCase = cases[btnId];
+
+    if (btnCase) btnCase();
   }
 
   //--------------------------------------------------------------------------
@@ -144,20 +160,26 @@ class ProjectView extends HTMLElement {
   }
 
   //--------------------------------------------------------------------------
+  // LEADERBOARD
+  //--------------------------------------------------------------------------
+
+  shareModalInit() {
+    const linkField = this.shadowRoot.getElementById("share-link");
+    const btn = this.shadowRoot.getElementById("copy-share-link");
+    linkField.value = window.location + "/join";
+  }
+
+  //--------------------------------------------------------------------------
   // DISPOSE
   //--------------------------------------------------------------------------
 
   disconnectedCallback() {
     // Clear Listeners
     this.#backBtn.onclick = null;
-    this.#addBtn.onclick = null;
-    this.#scoreBtn.onclick = null;
+    this.#btnContainer.removeEventListener("click", this.#handleModalBtns);
     this.#form.removeEventListener("taskAdded", this.taskAdded);
 
     // Clear html elements
-    this.#backBtn = null;
-    this.#addBtn = null;
-    this.#scoreBtn = null;
     this.#taskWrapper = null;
     this.#cardWrapper = null;
     this.#form = null;

@@ -15,7 +15,7 @@ export default class ModalHandler {
     const closeBtn = ModalHandler.#modals[id].elem.querySelector("[data-set-close]");
 
     if (!closeBtn) return;
-    closeBtn.onclick = () => { this.close };
+    closeBtn.onclick = () => { ModalHandler.close(id) };
   }
 
   /**

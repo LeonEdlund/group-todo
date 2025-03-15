@@ -75,7 +75,6 @@ $app->get('/login', function (Request $req, Response $res, $args) {
 });
 
 $app->get('/logout', function (Request $req, Response $res, $args) {
-  global $client;
   if (!isset($_SESSION["user"])) {
     return $res->withRedirect($_ENV["REROUTE_PATH"], 302);
   }
@@ -147,7 +146,7 @@ $app->get("/project/{id:\d+}/join", function ($req, $res, $args) {
 $app->get("/project/{id:\d+}/tasks", function ($req, $res, $args) {
   global $db;
 
-  $tasks = $db->getTasks($args["id"]);
+  $tasks = $db->getTasks($args["id"], $_SESSION["user"]->user_id);
 
   return $res->withJson($tasks, 200);
 })->add($authenticate);

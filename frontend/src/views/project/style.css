@@ -12,7 +12,7 @@
   font-size: x-large;
 }
 
-.btn-container {
+#btn-container {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -108,4 +108,24 @@ dialog::backdrop {
 
 dialog[open] {
   animation: modalOpen 0.3s ease-out;
+}
+
+
+/* SHARE LINK */
+#share-link-container {
+  display: flex;
+}
+
+#share-link {
+  background-color: transparent;
+  color: var(--color-text);
+  font-family: var(--font-family-lexend);
+  font-size: var(--font-heading-2);
+  border-radius: 5px;
+  width: 92%;
+}
+
+#share-link {
+  color: rgb(156, 156, 156);
+  border: 1px solid rgba(173, 173, 173, 0.328);
 }

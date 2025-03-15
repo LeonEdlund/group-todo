@@ -10,10 +10,10 @@ template.innerHTML = `
     </div>
 
 
-    <div class="btn-container">
+    <div id="btn-container">
       <button class="round-decoration" id="open-score"><ion-icon name="trophy-outline"></ion-icon></button>
       <button id="add-task"><ion-icon name="add-outline"></ion-icon></button>
-      <div class="round-decoration" id="share"><ion-icon name="person-add-outline"></ion-icon></ion-icon></div>
+      <button class="round-decoration" id="open-share"><ion-icon name="person-add-outline"></ion-icon></ion-icon></button>
     </div>
 
 
@@ -43,6 +43,10 @@ template.innerHTML = `
         <button class="closeBtn" data-set-close>X</button>
       </div>
 
-      <div id="score-wrapper"></div>
+    <div class="share-link-container">
+        <input type="text" id="share-link" value="https://example.com" readonly>
+        <button id="copy-share-link"><ion-icon name="copy-outline"</ion-icon></button>
+    </div>
+
     </dialog>
     `;

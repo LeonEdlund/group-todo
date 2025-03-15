@@ -92,6 +92,7 @@ class TaskContainer extends HTMLElement {
       this.#completed = false;
     }
 
+
     const taskToggled = new CustomEvent("taskToggled", {
       bubbles: true,
       composed: true,

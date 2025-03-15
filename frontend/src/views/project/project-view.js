@@ -6,20 +6,20 @@ import { getData } from "../../utils/api";
 import createCard from "../../utils/createCard";
 import createTask from "../../utils/createTask";
 import basePath from "../../utils/basePath";
+import ModalHandler from "../../utils/ModalHandler";
 
 class ProjectView extends HTMLElement {
   #id;
+  //BUTTONS
   #backBtn;
   #addBtn;
-  #taskWrapper;
-  #card;
+  #scoreBtn;
+  #shareBtn;
+  // ELEMENTS
   #cardWrapper;
+  #card;
+  #taskWrapper;
   #form;
-  #scoresModal;
-  #addTaskModal
-  #closeScoresBtn;
-  #closeTaskBtn;
-  #openScore;
 
   constructor() {
     super();
@@ -44,16 +44,13 @@ class ProjectView extends HTMLElement {
   async connectedCallback() {
     this.#backBtn = this.shadowRoot.getElementById("back-btn");
     this.#addBtn = this.shadowRoot.getElementById("add-task");
-    this.#openScore = this.shadowRoot.getElementById("open-score");
-    this.#closeScoresBtn = this.shadowRoot.getElementById("close-scores");
-    this.#closeTaskBtn = this.shadowRoot.getElementById("close-task-modal");
+    this.#scoreBtn = this.shadowRoot.getElementById("open-score");
     this.#taskWrapper = this.shadowRoot.getElementById("tasks-wrapper");
     this.#cardWrapper = this.shadowRoot.getElementById("card-wrapper");
-    this.#scoresModal = this.shadowRoot.getElementById("scores-modal");
-    this.#addTaskModal = this.shadowRoot.querySelector("#add-task-modal")
     this.#form = this.shadowRoot.querySelector("form-add-task");
     this.#form.setAttribute("project-id", this.#id);
 
+    this.#registerModals();
     this.#addEventlisteners();
 
     const cardData = await getData(`${basePath}/api/project/${this.#id}`);
@@ -64,24 +61,24 @@ class ProjectView extends HTMLElement {
 
   bindMethods() {
     this.taskAdded = this.taskAdded.bind(this);
+    this.loadScores = this.loadScores.bind(this);
+  }
+
+  #registerModals() {
+    ModalHandler.register("score-modal", this.shadowRoot.getElementById("scores-modal"), this.loadScores);
+    ModalHandler.register("add-task-modal", this.shadowRoot.getElementById("add-task-modal"));
+    ModalHandler.register("share-modal", this.shadowRoot.getElementById("share-modal"));
   }
 
   #addEventlisteners() {
     this.#backBtn.onclick = () => router.navigateTo("/");
-    this.#addBtn.onclick = () => { this.#addTaskModal.showModal(); };
-    this.#closeScoresBtn.onclick = () => { this.#scoresModal.close() }
-    this.#closeTaskBtn.onclick = () => { this.#addTaskModal.close() }
-    this.#taskWrapper.addEventListener("taskToggled", (e) => {
-      console.log(e.detail.progress.completed);
-      this.#card.setAttribute("progress", e.detail.progress.completed);
-    });
-
-    this.#openScore.onclick = async () => {
-      this.#scoresModal.showModal();
-      await this.loadScores();
-    };
+    this.#addBtn.onclick = () => { ModalHandler.open("add-task-modal"); };
+    this.#scoreBtn.onclick = async () => { ModalHandler.open("score-modal"); };
 
     this.#form.addEventListener("taskAdded", this.taskAdded);
+    this.#taskWrapper.addEventListener("taskToggled", (e) => {
+      this.#card.setAttribute("progress", e.detail.progresscompleted);
+    });
   }
 
   //--------------------------------------------------------------------------
@@ -118,7 +115,7 @@ class ProjectView extends HTMLElement {
   }
 
   async taskAdded() {
-    this.#addTaskModal.close();
+    ModalHandler.close("add-task-modal");
     const tasks = await this.#fetchTasks();
     this.#createTask(tasks);
   }
@@ -128,10 +125,11 @@ class ProjectView extends HTMLElement {
   //--------------------------------------------------------------------------
 
   async loadScores() {
-    const scoreWrapper = this.#scoresModal.querySelector("#score-wrapper");
+    const scoreWrapper = this.shadowRoot.querySelector("#score-wrapper");
     const scores = await getData(`${basePath}/api/project/${this.#id}/scores`);
+    scoreWrapper.innerHTML = "<p>Loading...</p>";
 
-    if (!scores) return;
+    if (!scores) { scoreWrapper.innerHTML = "<p>No Scores</p>"; return; };
 
     const scoresElements = scores.map(score => {
       const scoreCard = document.createElement("user-score-card");
@@ -153,18 +151,20 @@ class ProjectView extends HTMLElement {
     // Clear Listeners
     this.#backBtn.onclick = null;
     this.#addBtn.onclick = null;
-    this.#openScore.onclick = null;
+    this.#scoreBtn.onclick = null;
     this.#form.removeEventListener("taskAdded", this.taskAdded);
 
     // Clear html elements
     this.#backBtn = null;
     this.#addBtn = null;
-    this.#openScore = null;
-    this.#closeScoresBtn = null;
+    this.#scoreBtn = null;
     this.#taskWrapper = null;
     this.#cardWrapper = null;
-    this.#scoresModal = null;
     this.#form = null;
+
+    // unregister modals
+    ModalHandler.unregister("score-modal");
+    ModalHandler.unregister("add-task-modal");
   }
 }
 

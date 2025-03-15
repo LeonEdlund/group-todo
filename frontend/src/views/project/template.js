@@ -23,7 +23,7 @@ template.innerHTML = `
     <dialog id="add-task-modal">
       <div class="header">
         <h2>Create Task</h2>
-        <button class="closeBtn" id="close-task-modal">X</button>
+        <button class="closeBtn" data-set-close>X</button>
       </div>
       <form-add-task></form-add-task>
     </dialog>
@@ -31,10 +31,18 @@ template.innerHTML = `
     <dialog id="scores-modal">
       <div class="header">
         <h2>Scoreboard</h2>
-        <button class="closeBtn" id="close-scores">X</button>
+        <button class="closeBtn" data-set-close>X</button>
       </div>
 
-      <div id="score-wrapper">
+      <div id="score-wrapper"></div>
+    </dialog>
+
+    <dialog id="share-modal">
+      <div class="header">
+        <h2>Share</h2>
+        <button class="closeBtn" data-set-close>X</button>
       </div>
+
+      <div id="score-wrapper"></div>
     </dialog>
     `;

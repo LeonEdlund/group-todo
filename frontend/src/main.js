@@ -16,4 +16,6 @@ import "./views/home/home-view.js";
 import "./views/project/project-view.js";
 import "./views/login/LogInView.js";
 
+// Other
+import "./utils/ModalHandler.js";
 import "./Router.js";

@@ -114,12 +114,18 @@ class Database
     return $project;
   }
 
-  public function insertProject($title, $owner, $svg)
+  public function insertProject($title, $user, $svg)
   {
-    $query = "INSERT INTO `webb6_projects` (`owner_id`, `title`, `cover_svg`) VALUES (:owner_id, :title, :svg);";
-    $this->query($query, [":owner_id" => $owner, ":title" => $title, ":svg" => $svg]);
+    // INSERT PROJECT
+    $query = "INSERT INTO `webb6_projects` (`title`, `cover_svg`) VALUES (:title, :svg);";
+    $this->query($query, [":title" => $title, ":svg" => $svg]);
+    $projectId = $this->lastInsertId();
 
-    return ["id" => $this->lastInsertId()];
+    // INSERT OWNER IN MEMBERS TABLE
+    $query = "INSERT INTO `webb6_project_members` (`user_id`, `project_id`) VALUES (:user, :project);";
+    $this->query($query, [":user" => $user, ":project" => $projectId]);
+
+    return ["id" => $projectId];
   }
 
   /** 
@@ -144,10 +150,16 @@ class Database
 
   public function getTotalScore($projectId)
   {
-    $query = "SELECT users.profile_url, users.display_name, IFNULL(SUM(tasks.score), 0) AS total_score FROM webb6_users AS users LEFT JOIN webb6_tasks AS tasks ON tasks.completed_by = users.user_id AND tasks.project_id = :project_id WHERE users.user_id IN (
-    SELECT project_members.user_id FROM webb6_project_members AS project_members WHERE project_members.project_id = :project_id
-    UNION 
-    SELECT projects.owner_id FROM webb6_projects AS projects WHERE projects.project_id = :project_id) 
+    $query = "SELECT 
+    users.profile_url, 
+    users.display_name, 
+    IFNULL(SUM(tasks.score), 0) AS total_score 
+    FROM webb6_users AS users 
+    LEFT JOIN webb6_tasks AS tasks ON tasks.completed_by = users.user_id AND tasks.project_id = :project_id 
+    WHERE users.user_id IN 
+    (SELECT project_members.user_id 
+    FROM webb6_project_members AS project_members 
+    WHERE project_members.project_id = :project_id) 
     GROUP BY users.user_id, users.display_name;";
 
     return $this->query($query, [":project_id" => $projectId])->fetchAll();

@@ -114,8 +114,8 @@ $app->get("/project/{id:\d+}", function ($req, $res, $args) {
   return $res->withJson($project, 200);
 })->add($authenticate);
 
-// Specific project - Returns a post based on id 
-$app->delete("/project/{id:\d+}", function ($req, $res, $args) {
+// Deletes a project
+$app->post("/project/{id:\d+}/delete", function ($req, $res, $args) {
   global $db;
 
   $db->deleteProject($args["id"]);

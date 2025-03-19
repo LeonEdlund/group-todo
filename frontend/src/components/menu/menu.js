@@ -78,8 +78,8 @@ class Menu extends HTMLElement {
     }
 
     // Delete project
-    const response = await fetch(`${basePath}/api/project/${this.#projectId}`, {
-      method: "DELETE"
+    const response = await fetch(`${basePath}/api/project/${this.#projectId}/delete`, {
+      method: "POST"
     });
 
     // Show feedback

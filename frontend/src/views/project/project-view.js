@@ -199,7 +199,6 @@ class ProjectView extends HTMLElement {
   openMenu() {
     const menu = document.createElement("custom-menu");
     menu.setAttribute("project-id", this.#id);
-    console.log(menu);
     this.shadowRoot.appendChild(menu);
   }
 }

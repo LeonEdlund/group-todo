@@ -4,6 +4,8 @@ import { addStylesheetToShadowRoot } from "../../utils/style-manipulation";
 import basePath from "../../utils/basePath";
 
 class LogInView extends HTMLElement {
+  #button;
+
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
@@ -12,17 +14,17 @@ class LogInView extends HTMLElement {
   }
 
   connectedCallback() {
-    this.shadowRoot.querySelector("button").addEventListener("click", this.#redirect);
+    this.#button = this.shadowRoot.querySelector("button");
+    this.#button.addEventListener("click", this.#redirect);
   }
 
   disconnectedCallback() {
-    this.shadowRoot.querySelector("button").removeEventListener("click", this.#redirect);
+    this.#button.removeEventListener("click", this.#redirect);
   }
 
   #redirect() {
     window.location.href = `${basePath}/api/login`;
   }
-
 }
 
 customElements.define("login-view", LogInView);

@@ -6,7 +6,6 @@ template.innerHTML = `
 
     <div id="content-container">
       <div id="project-wrapper">
-        <project-list></project-list>
       </div>
 
       <div id="pop-up" class="hidden">
@@ -14,3 +13,6 @@ template.innerHTML = `
       </div>
     </div>
     `;
+
+
+// <project-list></project-list>

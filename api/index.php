@@ -126,7 +126,7 @@ $app->get("/project/{id:\d+}/scores", function ($req, $res, $args) {
 // Specific project - Returns a post based on id 
 $app->get("/project/{id:\d+}/join", function ($req, $res, $args) {
   if (!isset($_SESSION['user'])) {
-    $_SESSION["redirect_path_after_login"] = "{$_ENV['REROUTE_PATH']}project/{$args['id']}";
+    $_SESSION["redirect_path_after_login"] = "{$_ENV['REROUTE_PATH']}project/{$args['id']}/join";
     return $res->withRedirect("{$_ENV['REROUTE_PATH']}login", 301);
   }
 
@@ -162,7 +162,7 @@ $app->post("/project/{id:\d+}/tasks", function ($req, $res, $args) {
 })->add($authenticate);
 
 // Patch - Updates the completion status of a task
-$app->patch("/project/{project_id:\d+}/tasks/{task_id:\d+}/completed", function ($req, $res, $args) {
+$app->post("/project/{project_id:\d+}/tasks/{task_id:\d+}/completed", function ($req, $res, $args) {
   global $db;
 
   $input = $req->getParsedBody();
@@ -171,7 +171,7 @@ $app->patch("/project/{project_id:\d+}/tasks/{task_id:\d+}/completed", function 
   return $res->withJson($response);
 })->add($authenticate);
 
-$app->patch("/project/{project_id:\d+}/tasks/{task_id:\d+}/uncompleted", function ($req, $res, $args) {
+$app->post("/project/{project_id:\d+}/tasks/{task_id:\d+}/uncompleted", function ($req, $res, $args) {
   global $db;
 
   $input = $req->getParsedBody();

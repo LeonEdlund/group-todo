@@ -212,8 +212,15 @@ class Database
     $this->query($query, [":user" => $user, ":project_id" => $projectId, ":task_id" => $taskId]);
 
     $progress = $this->getProgress($projectId);
+    $completedBy = $this->getTaskCompletedBy($taskId);
 
-    return ["project" => $projectId, "completed" => "{$progress->progress_percentage}%"];
+    $returArr = [
+      "project" => $projectId,
+      "completed" => "{$progress->progress_percentage}%",
+      "completed_by" => $completedBy
+    ];
+
+    return  $returArr;
   }
 
   public function uncompleteTask($projectId, $taskId)
@@ -223,8 +230,22 @@ class Database
     $this->query($query, [":project_id" => $projectId, ":task_id" => $taskId]);
 
     $progress = $this->getProgress($projectId);
+    $completedBy = $this->getTaskCompletedBy($taskId);
 
-    return ["project" => $projectId, "completed" => "{$progress->progress_percentage}%"];
+    $returArr = [
+      "project" => $projectId,
+      "completed" => "{$progress->progress_percentage}%",
+      "completed_by" => $completedBy
+    ];
+
+    return $returArr;
+  }
+
+  private function getTaskCompletedBy($id)
+  {
+    $query = "SELECT users.display_name FROM webb6_users AS users INNER JOIN webb6_tasks AS tasks ON users.user_id = tasks.completed_by WHERE tasks.task_id = :task_id";
+
+    return $this->query($query, [":task_id" => $id])->fetch();
   }
 
   /** 

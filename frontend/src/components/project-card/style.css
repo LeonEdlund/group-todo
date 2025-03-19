@@ -1,6 +1,6 @@
 @import url(../../styles/shared-styles.css);
 
-.btn-three-dots {
+#btn-three-dots {
   background-color: var(--color-accent);
   background-image: url("src/resources/three-dots.svg");
   color: black;
@@ -8,7 +8,7 @@
   border-radius: 50%;
 }
 
-.btn-three-dots img {
+#btn-three-dots img {
   width: 0.9rem;
 }
 

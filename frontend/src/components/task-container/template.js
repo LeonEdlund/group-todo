@@ -24,8 +24,6 @@ template.innerHTML = `
         <div id="description-wrapper">
           <p>Description</p>
           <i id="description"></i>
-        
-
         </div>
           
       </div>`;

@@ -32,11 +32,11 @@ class BtnBigBlue extends HTMLElement {
 
     if (!this.#clicked) {
       this.#clicked = true;
-      eventName = "openPopup";
+      eventName = "button-toggled";
       this.shadowRoot.querySelector("button").style.transform = "rotate(45deg)";
     } else {
       this.#clicked = false;
-      eventName = "closePopup"
+      eventName = "button-untoggled";
       this.shadowRoot.querySelector("button").style.transform = "rotate(0deg)";
     }
 

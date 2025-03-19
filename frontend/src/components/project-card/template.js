@@ -9,7 +9,7 @@ template.innerHTML = `
 
           <div class="flex-row space-between align-center">
             <h2 class="todo-group-item-title"></h2>
-            <button class="btn-three-dots"><img id="three-dots-img" alt="three-dots"></button>
+            <button id="btn-three-dots"><img id="three-dots-img" alt="three-dots"></button>
           </div>
 
           <ul class="reset-ul" id="members">

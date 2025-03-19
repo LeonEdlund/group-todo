@@ -20,6 +20,7 @@ class TaskContainer extends HTMLElement {
     addStylesheetToShadowRoot(style, this.shadowRoot);
 
     this.#expanded = false;
+    this.#completed = false;
     this.#arrowBtn = this.shadowRoot.getElementById("arrow-btn");
     this.#checkbox = this.shadowRoot.getElementById("ch1");
     this.#descriptionWrapper = this.shadowRoot.getElementById("description-wrapper");
@@ -50,19 +51,43 @@ class TaskContainer extends HTMLElement {
         this.shadowRoot.getElementById("assigned").innerText = `Points: ${score}`;
         break;
       case "completed-by":
-        this.#completed = true;
+        const completedByValue = this.getAttribute("completed-by");
+        const existingCompletedBy = this.shadowRoot.querySelector("#completed-by");
 
-        // create completed by section
-        const completedTitle = document.createElement("p");
-        completedTitle.innerText = "Completed By";
-        const name = document.createElement("i");
-        name.innerText = this.getAttribute("completed-by")
-        completedTitle.appendChild(name);
-        this.#descriptionWrapper.append(completedTitle, name);
+        if (completedByValue && completedByValue.trim() !== "") {
+          // Task is completed
+          this.#completed = true;
+          this.#checkbox.checked = true;
 
-        //Fill checkbox
-        this.#checkbox.checked = true;
+          if (!existingCompletedBy) {
+            // Create completed by section
+            const wrapper = document.createElement("div");
+            wrapper.id = "completed-by";
 
+            const completedTitle = document.createElement("p");
+            completedTitle.innerText = "Completed By";
+
+            const name = document.createElement("i");
+            name.innerText = completedByValue;
+
+            wrapper.append(completedTitle, name);
+            this.#descriptionWrapper.appendChild(wrapper);
+          } else {
+            // Update existing value
+            const nameElement = existingCompletedBy.querySelector("i");
+            if (nameElement) {
+              nameElement.innerText = completedByValue;
+            }
+          }
+        } else {
+          // Task is not completed
+          this.#completed = false;
+          this.#checkbox.checked = false;
+
+          if (existingCompletedBy) {
+            existingCompletedBy.remove();
+          }
+        }
         break;
     }
   }
@@ -82,22 +107,16 @@ class TaskContainer extends HTMLElement {
   async toggleCheckbox() {
     const projectId = this.getAttribute("project-id");
     const id = this.getAttribute("id");
-    let progress;
+    const mode = this.#completed ? "uncompleted" : "completed";
 
-    if (!this.#completed) {
-      progress = await uploadJSON(`${basePath}/api/project/${projectId}/tasks/${id}/completed`, "PATCH");
-      this.#completed = true;
-    } else {
-      progress = await uploadJSON(`${basePath}/api/project/${projectId}/tasks/${id}/uncompleted`, "PATCH");
-      this.#completed = false;
-    }
-
+    let task = await uploadJSON(`${basePath}/api/project/${projectId}/tasks/${id}/${mode}`, "POST");
+    this.setAttribute("completed-by", task.completed_by.display_name || "");
 
     const taskToggled = new CustomEvent("taskToggled", {
       bubbles: true,
       composed: true,
       detail: {
-        progress: progress
+        progress: task.completed
       }
     });
 

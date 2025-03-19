@@ -3,7 +3,7 @@ export default template;
 
 template.innerHTML = `
     <div id="backbar">
-      <p id="back-btn">Back</p>
+      <p id="back-btn"><ion-icon name="chevron-back-outline" size="large"></ion-icon> Back</p>
     </div>
     
     <div id="card-wrapper">
@@ -12,8 +12,14 @@ template.innerHTML = `
 
     <div id="btn-container">
       <button class="round-decoration" id="open-score"><ion-icon name="trophy-outline"></ion-icon></button>
-      <button id="add-task"><ion-icon name="add-outline"></ion-icon></button>
-      <button class="round-decoration" id="open-share"><ion-icon name="person-add-outline"></ion-icon></ion-icon></button>
+
+      <button id="add-task">
+        <ion-icon name="add-outline"></ion-icon>
+      </button>
+
+      <button class="round-decoration" id="open-share">
+        <ion-icon name="person-add-outline"></ion-icon>
+      </button>
     </div>
 
 
@@ -43,10 +49,10 @@ template.innerHTML = `
         <button class="closeBtn" data-set-close>X</button>
       </div>
 
-    <div class="share-link-container">
+      <div class="share-link-container">
         <input type="text" id="share-link" value="https://example.com" readonly>
-        <button id="copy-share-link"><ion-icon name="copy-outline"</ion-icon></button>
-    </div>
+      </div>
+        
+    </dialog>`;
 
-    </dialog>
-    `;
+// <button id="copy-share-link"><ion-icon name="copy-outline"</ion-icon></button>

@@ -1,10 +1,14 @@
 import Router from "vanilla-router";
 import isAuthenticated from "./utils/isAuthenticated";
-import { gsap } from "gsap";
+import { getData } from "./utils/api";
 import basePath from "./utils/basePath";
+// import { gsap } from "gsap";
 
 const app = document.getElementById("app");
 
+//--------------------------------------------------------------------------
+// INIT
+//--------------------------------------------------------------------------
 export var router = new Router({
   mode: 'history',
   root: '/~le223nd/webbteknik-6/to-do-app',
@@ -14,6 +18,10 @@ export var router = new Router({
   }
 });
 
+
+//--------------------------------------------------------------------------
+// HOME
+//--------------------------------------------------------------------------
 router.add('', async function () {
   const user = await isAuthenticated();
 
@@ -22,32 +30,51 @@ router.add('', async function () {
     return;
   }
 
-  app.innerHTML = "";
   const homeView = document.createElement("home-view");
-  const navBar = document.createElement("nav-footer");
-  navBar.setAttribute("profile-pic", user.profile_url);
-  app.append(homeView, navBar);
+  const loggedInUser = document.createElement("nav-footer");
+  loggedInUser.setAttribute("profile-pic", user.profile_url);
+
+  app.innerHTML = "";
+  app.append(homeView, loggedInUser);
 });
 
+
+//--------------------------------------------------------------------------
+// PROJECT
+//--------------------------------------------------------------------------
 router.add('project/(:num)', async function (id) {
+  app.innerHTML = "<h3>Loading...</h3>";
+
   const user = await isAuthenticated();
   if (!user) {
     router.navigateTo("/login");
     return;
   }
 
-  // get data 
-  app.innerHTML = "";
+  const cardData = await getData(`${basePath}/api/project/${id}`);
+  const tasks = await getData(`${basePath}/api/project/${id}/tasks`);
+
   const projectView = document.createElement("project-view");
   projectView.projectId = id;
-  app.appendChild(projectView);
+  projectView.project = cardData;
+  projectView.tasks = tasks;
 
+  app.innerHTML = "";
+  app.appendChild(projectView);
 });
 
+
+//--------------------------------------------------------------------------
+// JOIN 
+//--------------------------------------------------------------------------
 router.add('project/(:num)/join', async function (id) {
   window.location.href = `${window.location.origin}${basePath}/api/project/${id}/join`;
 });
 
+
+//--------------------------------------------------------------------------
+// LOG IN
+//--------------------------------------------------------------------------
 router.add("login", async function () {
   const user = await isAuthenticated();
 
@@ -62,8 +89,8 @@ router.add("login", async function () {
 });
 
 
+//--------------------------------------------------------------------------
+// RUN
+//--------------------------------------------------------------------------
 router.addUriListener();
 router.check();
-
-
-// router.navigateTo('');

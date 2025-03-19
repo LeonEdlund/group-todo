@@ -46,17 +46,15 @@ class FormAddTask extends HTMLElement {
           description: formObject.description,
           score: formObject.score
         })
-
       });
 
     if (response.ok) {
       const taskAddedEvent = new CustomEvent("taskAdded");
       this.dispatchEvent(taskAddedEvent);
     } else {
-      console.log("Something went wrong when uploading task");
+      console.log("Something went wrong when uploading task", response);
     }
   }
-
 }
 
 customElements.define("form-add-task", FormAddTask);

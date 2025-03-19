@@ -67,7 +67,7 @@ export default class ModalHandler {
 
 
   /**
-   * Un register modal
+   * get all registred modals.
    * 
    * @returns {undefined}
    */

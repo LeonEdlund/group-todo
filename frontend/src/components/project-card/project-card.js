@@ -16,6 +16,7 @@ class ProjectCard extends HTMLElement {
 
   connectedCallback() {
     this.shadowRoot.getElementById("three-dots-img").src = threeDotsImg;
+    this.shadowRoot.getElementById("btn-three-dots").addEventListener("click", this.#menuEvent);
   }
 
   attributeChangedCallback(name) {
@@ -37,6 +38,14 @@ class ProjectCard extends HTMLElement {
         this.shadowRoot.querySelector(".img-container").innerHTML = coverImg;
         break;
     }
+  }
+
+  #menuEvent() {
+    const menuEvent = new CustomEvent("card:menu-clicked", {
+      bubbles: true,
+      composed: true
+    });
+    this.dispatchEvent(menuEvent, { composed: true });
   }
 }
 

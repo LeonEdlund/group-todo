@@ -6,13 +6,12 @@ import { getData } from "../../utils/api";
 import createCard from "../../utils/createCard";
 import createTask from "../../utils/createTask";
 import basePath from "../../utils/basePath";
-import ModalHandler from "../../utils/ModalHandler";
+import ModalHandler from "../../Handlers/ModalHandler";
 
 class ProjectView extends HTMLElement {
   #id;
   #btnContainer
   #backBtn;
-  #copyShareLink;
   #cardWrapper;
   #card;
   #taskWrapper;
@@ -23,7 +22,17 @@ class ProjectView extends HTMLElement {
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
     addStylesheetToShadowRoot(style, this.shadowRoot);
-    this.bindMethods();
+    this.#bindMethods();
+
+    // BUTTONS
+    this.#btnContainer = this.shadowRoot.getElementById("btn-container");
+    this.#backBtn = this.shadowRoot.getElementById("back-btn");
+
+    // ELEMENTS
+    this.#cardWrapper = this.shadowRoot.getElementById("card-wrapper");
+    this.#taskWrapper = this.shadowRoot.getElementById("tasks-wrapper");
+    this.#form = this.shadowRoot.querySelector("form-add-task");
+    this.#card = null;
   }
 
   //--------------------------------------------------------------------------
@@ -34,39 +43,35 @@ class ProjectView extends HTMLElement {
     this.#id = id;
   }
 
+  set project(project) {
+    this.#updateCard(project);
+  }
+
+  set tasks(tasks) {
+    this.#createTask(tasks);
+  }
+
   //--------------------------------------------------------------------------
   // INITIALIZING
   //--------------------------------------------------------------------------
 
   async connectedCallback() {
-    // BUTTONS
-    this.#btnContainer = this.shadowRoot.getElementById("btn-container");
-    this.#backBtn = this.shadowRoot.getElementById("back-btn");
-
-    // ELEMENTS
-    this.#cardWrapper = this.shadowRoot.getElementById("card-wrapper");
-    this.#taskWrapper = this.shadowRoot.getElementById("tasks-wrapper");
-    this.#form = this.shadowRoot.querySelector("form-add-task");
     this.#form.setAttribute("project-id", this.#id);
-
     this.#registerModals();
     this.#addEventlisteners();
-
-    const cardData = await getData(`${basePath}/api/project/${this.#id}`);
-    const tasks = await this.#fetchTasks();
-    this.#createTask(tasks);
-    this.#updateCard(cardData);
   }
 
-  bindMethods() {
+  #bindMethods() {
     this.taskAdded = this.taskAdded.bind(this);
+    this.updateCardProgress = this.updateCardProgress.bind(this);
     this.loadScores = this.loadScores.bind(this);
     this.shareModalInit = this.shareModalInit.bind(this);
+    this.openMenu = this.openMenu.bind(this);
   }
 
   #registerModals() {
-    ModalHandler.register("score-modal", this.shadowRoot.getElementById("scores-modal"), this.loadScores);
     ModalHandler.register("add-task-modal", this.shadowRoot.getElementById("add-task-modal"));
+    ModalHandler.register("score-modal", this.shadowRoot.getElementById("scores-modal"), this.loadScores);
     ModalHandler.register("share-modal", this.shadowRoot.getElementById("share-modal"), this.shareModalInit);
   }
 
@@ -75,9 +80,8 @@ class ProjectView extends HTMLElement {
     this.#backBtn.onclick = () => router.navigateTo("/");
 
     this.#form.addEventListener("taskAdded", this.taskAdded);
-    this.#taskWrapper.addEventListener("taskToggled", (e) => {
-      this.#card.setAttribute("progress", e.detail.progress.completed);
-    });
+    this.#taskWrapper.addEventListener("taskToggled", this.updateCardProgress);
+    this.#card.addEventListener("card:menu-clicked", this.openMenu);
   }
 
   #handleModalBtns(event) {
@@ -97,21 +101,41 @@ class ProjectView extends HTMLElement {
     if (btnCase) btnCase();
   }
 
+  disconnectedCallback() {
+    // Clear Listeners
+    this.#form.removeEventListener("taskAdded", this.taskAdded);
+    this.#taskWrapper.removeEventListener("taskToggled", this.updateCardProgress);
+    this.#btnContainer.removeEventListener("click", this.#handleModalBtns);
+    this.#backBtn.onclick = null;
+
+    // Clear html elements
+    this.#taskWrapper = null;
+    this.#cardWrapper = null;
+    this.#form = null;
+
+    // unregister modals
+    ModalHandler.unregister("score-modal");
+    ModalHandler.unregister("add-task-modal");
+    ModalHandler.unregister("share-modal");
+  }
+
   //--------------------------------------------------------------------------
   // CARD METHODS
   //--------------------------------------------------------------------------
 
   #updateCard(data) {
     if (!data) return;
-
     this.#card = createCard(data);
     this.#cardWrapper.appendChild(this.#card);
+  }
+
+  updateCardProgress(event) {
+    this.#card.setAttribute("progress", event.detail.progress);
   }
 
   //--------------------------------------------------------------------------
   // TASK METHODS
   //--------------------------------------------------------------------------
-
 
   async #fetchTasks() {
     this.#taskWrapper.innerHTML = "Loading...";
@@ -160,33 +184,27 @@ class ProjectView extends HTMLElement {
   }
 
   //--------------------------------------------------------------------------
-  // LEADERBOARD
+  // SHARE MODAL
   //--------------------------------------------------------------------------
 
   shareModalInit() {
     const linkField = this.shadowRoot.getElementById("share-link");
-    const btn = this.shadowRoot.getElementById("copy-share-link");
     linkField.value = window.location + "/join";
   }
 
   //--------------------------------------------------------------------------
-  // DISPOSE
+  // MENU
   //--------------------------------------------------------------------------
 
-  disconnectedCallback() {
-    // Clear Listeners
-    this.#backBtn.onclick = null;
-    this.#btnContainer.removeEventListener("click", this.#handleModalBtns);
-    this.#form.removeEventListener("taskAdded", this.taskAdded);
-
-    // Clear html elements
-    this.#taskWrapper = null;
-    this.#cardWrapper = null;
-    this.#form = null;
-
-    // unregister modals
-    ModalHandler.unregister("score-modal");
-    ModalHandler.unregister("add-task-modal");
+  openMenu() {
+    const menu = document.createElement("custom-menu");
+    menu.setAttribute("title", "Edit");
+    menu.innerHTML = `<li slot="list-item">
+      <ion-icon name="close-circle-outline" size="large"></ion-icon>
+      <a href="/api/project/${this.#id}/delete">Delete</a>
+    </li>`;
+    console.log(menu);
+    this.shadowRoot.appendChild(menu);
   }
 }
 

@@ -9,7 +9,7 @@ const app = document.getElementById("app");
 //--------------------------------------------------------------------------
 // INIT
 //--------------------------------------------------------------------------
-export var router = new Router({
+export const router = new Router({
   mode: 'history',
   root: '/~le223nd/webbteknik-6/to-do-app',
   page404: function (path) {

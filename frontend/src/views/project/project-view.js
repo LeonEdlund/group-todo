@@ -198,11 +198,7 @@ class ProjectView extends HTMLElement {
 
   openMenu() {
     const menu = document.createElement("custom-menu");
-    menu.setAttribute("title", "Edit");
-    menu.innerHTML = `<li slot="list-item">
-      <ion-icon name="close-circle-outline" size="large"></ion-icon>
-      <a href="/api/project/${this.#id}/delete">Delete</a>
-    </li>`;
+    menu.setAttribute("project-id", this.#id);
     console.log(menu);
     this.shadowRoot.appendChild(menu);
   }

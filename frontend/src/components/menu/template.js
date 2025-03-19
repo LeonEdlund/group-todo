@@ -4,9 +4,12 @@ export default template;
 template.innerHTML = `
 <div id="overlay">
   <div id="wrapper">
-    <h2></h2>
+    <h2>Edit</h2>
     <ul>
-      <slot name="list-item"></slot>
-    </ul>
-  </div>
-</div>`;
+      <li slot="list-item" id="delete">
+        <ion-icon name="close-circle-outline" size="large"></ion-icon>
+        <h3>Delete</h3>
+    </li>
+    </ul >
+  </div >
+</div > `;

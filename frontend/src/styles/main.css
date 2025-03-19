@@ -41,6 +41,16 @@ body {
   overflow-x: hidden;
 }
 
+* {
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+*::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, Opera */
+}
+
 #app {
   display: flex;
   flex-direction: column;

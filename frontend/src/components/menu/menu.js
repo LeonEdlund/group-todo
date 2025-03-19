@@ -1,13 +1,18 @@
 import template from "./template";
 import style from "./style.css?inline";
 import { addStylesheetToShadowRoot } from "../../utils/style-manipulation";
+import basePath from "../../utils/basePath";
+import { router } from "../../Router";
+
 import { gsap } from "gsap";
 
 class Menu extends HTMLElement {
   #overlay;
   #wrapper;
+  #deleteBtn;
+  #projectId;
 
-  static observedAttributes = ["title"];
+  static observedAttributes = ["title", "project-id"];
 
   constructor() {
     super();
@@ -16,19 +21,24 @@ class Menu extends HTMLElement {
     addStylesheetToShadowRoot(style, this.shadowRoot);
 
     this.close = this.close.bind(this);
+    this.delete = this.delete.bind(this);
   }
 
   connectedCallback() {
     this.#overlay = this.shadowRoot.getElementById("overlay");
     this.#wrapper = this.shadowRoot.getElementById("wrapper");
-    this.#overlay.addEventListener("click", this.close);
-    this.#animateIn();
+    this.#deleteBtn = this.shadowRoot.getElementById("delete")
 
+    this.#overlay.addEventListener("click", this.close);
+    this.#deleteBtn.addEventListener("click", this.delete);
+    this.#animateIn();
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
-    if (name === "title") {
-      this.shadowRoot.querySelector("h2").innerText = this.getAttribute("title");
+    switch (name) {
+      case "project-id":
+        this.#projectId = newValue;
+        break;
     }
   }
 
@@ -44,7 +54,7 @@ class Menu extends HTMLElement {
   }
 
   close(event) {
-    if (event.target.id === "wrapper") return;
+    if (event.target.id !== "overlay") return;
     //animate out
     gsap.to(this.#overlay, {
       opacity: 0,
@@ -52,6 +62,34 @@ class Menu extends HTMLElement {
     });
 
     gsap.to(this.#wrapper, { y: 400, onComplete: () => { this.remove(); } });
+  }
+
+  async delete() {
+    const feedback = document.createElement("div");
+    feedback.id = "feedback";
+
+    const onFeedback = (reRoute) => {
+      if (reRoute) {
+        router.navigateTo("/")
+      } else {
+        feedback.remove()
+      }
+    }
+
+    const response = await fetch(`${basePath}/api/project/${this.#projectId}`, {
+      method: "DELETE"
+    });
+
+    feedback.innerHTML = response.ok ? "<p>Project Deleted</p>" : "<p>Something went wrong</p>";
+    this.shadowRoot.appendChild(feedback);
+
+    gsap.to(feedback, {
+      y: 120, duration: 0.3, onComplete: () => {
+        setTimeout(() => {
+          onFeedback();
+        }, 1000); // 1 second delay
+      }
+    });
   }
 }
 

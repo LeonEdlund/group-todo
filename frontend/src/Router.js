@@ -52,6 +52,12 @@ router.add('project/(:num)', async function (id) {
   }
 
   const cardData = await getData(`${basePath}/api/project/${id}`);
+
+  if (!cardData) {
+    router.navigateTo("/");
+    return;
+  };
+
   const tasks = await getData(`${basePath}/api/project/${id}/tasks`);
 
   const projectView = document.createElement("project-view");

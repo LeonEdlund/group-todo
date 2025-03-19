@@ -119,15 +119,22 @@ class Database
   public function insertProject($title, $user, $svg)
   {
     // INSERT PROJECT
-    $query = "INSERT INTO `webb6_projects` (`title`, `cover_svg`) VALUES (:title, :svg);";
+    $query = "INSERT INTO webb6_projects (title, cover_svg) VALUES (:title, :svg);";
     $this->query($query, [":title" => $title, ":svg" => $svg]);
     $projectId = $this->lastInsertId();
 
     // INSERT OWNER IN MEMBERS TABLE
-    $query = "INSERT INTO `webb6_project_members` (`user_id`, `project_id`) VALUES (:user, :project);";
+    $query = "INSERT INTO webb6_project_members (user_id, project_id) VALUES (:user, :project);";
     $this->query($query, [":user" => $user, ":project" => $projectId]);
 
     return ["id" => $projectId];
+  }
+
+  public function deleteProject($projectId)
+  {
+    $query = "DELETE FROM webb6_projects AS project WHERE project.project_id = :id;";
+    $status = $this->query($query, [":id" => $projectId]);
+    return $status;
   }
 
   /** 
@@ -145,7 +152,7 @@ class Database
 
   public function insertMember($userId, $projectId)
   {
-    $query = "INSERT INTO `webb6_project_members` (`user_id`, `project_id`) VALUES (:user_id, :project_id) ON DUPLICATE KEY UPDATE user_id = user_id";
+    $query = "INSERT INTO webb6_project_members (user_id, project_id) VALUES (:user_id, :project_id) ON DUPLICATE KEY UPDATE user_id = user_id";
 
     return $this->query($query, [":user_id" => $userId, ":project_id" => $projectId]);
   }
@@ -198,7 +205,7 @@ class Database
 
   public function insertTask($id, $args)
   {
-    $query = "INSERT INTO `webb6_tasks` (`project_id`, `title`, `description_text`, `score`) VALUES (:project_id, :title, :description_text, :score)";
+    $query = "INSERT INTO webb6_tasks (project_id, title, description_text, score) VALUES (:project_id, :title, :description_text, :score)";
 
     $this->query($query, [":project_id" => $id, ":title" => $args["title"], ":description_text" => $args["description"],  ":score" => $args["score"]]);
 

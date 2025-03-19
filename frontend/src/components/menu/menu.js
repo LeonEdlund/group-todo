@@ -68,6 +68,7 @@ class Menu extends HTMLElement {
     const feedback = document.createElement("div");
     feedback.id = "feedback";
 
+    // if reRoute is true go to index else remove feedback.
     const onFeedback = (reRoute) => {
       if (reRoute) {
         router.navigateTo("/")
@@ -76,17 +77,19 @@ class Menu extends HTMLElement {
       }
     }
 
+    // Delete project
     const response = await fetch(`${basePath}/api/project/${this.#projectId}`, {
       method: "DELETE"
     });
 
+    // Show feedback
     feedback.innerHTML = response.ok ? "<p>Project Deleted</p>" : "<p>Something went wrong</p>";
     this.shadowRoot.appendChild(feedback);
 
     gsap.to(feedback, {
       y: 120, duration: 0.3, onComplete: () => {
         setTimeout(() => {
-          onFeedback();
+          onFeedback(response.ok);
         }, 1000); // 1 second delay
       }
     });

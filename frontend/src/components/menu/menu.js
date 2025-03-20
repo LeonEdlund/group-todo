@@ -3,7 +3,6 @@ import style from "./style.css?inline";
 import { addStylesheetToShadowRoot } from "../../utils/style-manipulation";
 import basePath from "../../utils/basePath";
 import { router } from "../../Router";
-
 import { gsap } from "gsap";
 
 class Menu extends HTMLElement {

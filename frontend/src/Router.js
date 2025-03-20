@@ -43,7 +43,7 @@ router.add('', async function () {
 // PROJECT
 //--------------------------------------------------------------------------
 router.add('project/(:num)', async function (id) {
-  app.innerHTML = "<h3>Loading...</h3>";
+  app.innerHTML = `<small-loader class="center"></small-loader>`;
 
   const user = await isAuthenticated();
   if (!user) {

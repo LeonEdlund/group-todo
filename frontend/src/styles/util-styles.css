@@ -25,3 +25,7 @@
 .place-right {
   margin-left: auto;
 }
+
+.center {
+  align-self: center;
+}

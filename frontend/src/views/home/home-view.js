@@ -24,13 +24,14 @@ class Home extends HTMLElement {
   #bindMethods() {
     this.openPopUp = this.openPopUp.bind(this);
     this.closePopUp = this.closePopUp.bind(this);
+    this.openEditMenu = this.openEditMenu.bind(this);
   }
 
   connectedCallback() {
     this.#itemWrapper.innerHTML = `<small-loader class="center"></h3>`;
     this.#addEventlisteners();
     this.#fetchData();
-    this.#itemWrapper.addEventListener("click", this.navigateTo);
+    // this.#itemWrapper.addEventListener("click", this.navigateTo);
   }
 
   disconnectedCallback() {
@@ -40,6 +41,8 @@ class Home extends HTMLElement {
   }
 
   #addEventlisteners() {
+    document.addEventListener("card:card-clicked", this.navigateTo);
+    document.addEventListener("card:menu-clicked", this.openEditMenu);
     this.addEventListener("button-toggled", this.openPopUp);
     this.addEventListener("button-untoggled", this.closePopUp);
   }
@@ -94,11 +97,20 @@ class Home extends HTMLElement {
   }
 
   navigateTo(event) {
-    const projectCard = event.target.closest("project-card");
-    if (projectCard) {
-      const projectId = projectCard.getAttribute("id");
-      router.navigateTo(`/project/${projectId}`);
+    const id = event.detail.id;
+    if (id) {
+      router.navigateTo(`/project/${id}`);
     }
+  }
+
+  openEditMenu(event) {
+    const projectId = event.detail.id;
+    console.log(projectId);
+    const menu = document.createElement("custom-menu");
+    if (!projectId) return;
+
+    menu.projectId = projectId;
+    this.shadowRoot.appendChild(menu);
   }
 }
 

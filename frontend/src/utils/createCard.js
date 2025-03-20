@@ -5,7 +5,7 @@ export default function createCard(project) {
 
   const card = document.createElement("project-card");
   const createdAt = parseDate(project.created_at);
-  card.setAttribute("id", project.project_id);
+  card.projectId = project.project_id;
   card.setAttribute("title", project.title);
   card.setAttribute("created", createdAt);
   card.setAttribute("cover_img", project.img);

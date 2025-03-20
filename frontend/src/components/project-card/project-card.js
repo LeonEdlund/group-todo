@@ -5,6 +5,8 @@ import { addStylesheetToShadowRoot } from "../../utils/style-manipulation";
 import generateSvg from "../../utils/generateSvg";
 
 class ProjectCard extends HTMLElement {
+  #projectId;
+
   static observedAttributes = ["title", "created", "progress", "cover_img"];
 
   constructor() {
@@ -12,11 +14,25 @@ class ProjectCard extends HTMLElement {
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
     addStylesheetToShadowRoot(style, this.shadowRoot);
+    this.#bindMethods();
+  }
+
+  set projectId(id) {
+    this.#projectId = id;
   }
 
   connectedCallback() {
     this.shadowRoot.getElementById("three-dots-img").src = threeDotsImg;
-    this.shadowRoot.getElementById("btn-three-dots").addEventListener("click", this.#menuEvent);
+    this.addEventListener("click", this.#cardClick);
+    this.shadowRoot.getElementById("btn-three-dots").addEventListener("click", this.menuEvent);
+  }
+
+  disconnectedCallback() {
+    this.shadowRoot.getElementById("btn-three-dots").removeEventListener("click", this.menuEvent);
+  }
+
+  #bindMethods() {
+    this.menuEvent = this.menuEvent.bind(this);
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -37,12 +53,28 @@ class ProjectCard extends HTMLElement {
     }
   }
 
-  #menuEvent() {
+  #cardClick(e) {
+    const cardEvent = new CustomEvent("card:card-clicked", {
+      bubbles: true,
+      composed: true,
+      detail: {
+        id: this.#projectId,
+      }
+    });
+    this.dispatchEvent(cardEvent);
+  }
+
+  menuEvent(e) {
+    e.stopPropagation();
+
     const menuEvent = new CustomEvent("card:menu-clicked", {
       bubbles: true,
-      composed: true
+      composed: true,
+      detail: {
+        id: this.#projectId,
+      }
     });
-    this.dispatchEvent(menuEvent, { composed: true });
+    this.dispatchEvent(menuEvent);
   }
 }
 

@@ -35,6 +35,8 @@ class Home extends HTMLElement {
   }
 
   disconnectedCallback() {
+    document.removeEventListener("card:card-clicked", this.navigateTo);
+    document.removeEventListener("card:menu-clicked", this.openEditMenu);
     this.removeEventListener("button-toggled", this.openPopUp);
     this.removeEventListener("button-untoggled", this.closePopUp);
     this.#allowScroll(true);

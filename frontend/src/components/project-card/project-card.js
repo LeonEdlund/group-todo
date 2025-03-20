@@ -29,6 +29,7 @@ class ProjectCard extends HTMLElement {
 
   disconnectedCallback() {
     this.shadowRoot.getElementById("btn-three-dots").removeEventListener("click", this.menuEvent);
+    this.removeEventListener("click", this.#cardClick);
   }
 
   #bindMethods() {

@@ -27,7 +27,7 @@ class Home extends HTMLElement {
   }
 
   connectedCallback() {
-    this.#itemWrapper.innerHTML = "<h3>Loading...</h3>";
+    this.#itemWrapper.innerHTML = `<small-loader class="center"></h3>`;
     this.#addEventlisteners();
     this.#fetchData();
     this.#itemWrapper.addEventListener("click", this.navigateTo);

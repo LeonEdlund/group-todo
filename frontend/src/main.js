@@ -10,6 +10,7 @@ import "./components/form-add-task/form-add-task.js";
 import "./components/nav-footer/nav-footer.js";
 import "./components/user-score-card/user-score-card.js";
 import "./components/menu/menu.js";
+import "./components/small-loader/small-loader.js";
 
 // views
 import "./views/home/home-view.js";

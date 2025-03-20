@@ -57,6 +57,9 @@ li {
 
 #feedback {
   position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
   top: -100px;
   left: 50%;
   transform: translateX(-50%);

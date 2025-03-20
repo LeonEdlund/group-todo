@@ -19,7 +19,10 @@ class Menu extends HTMLElement {
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
     addStylesheetToShadowRoot(style, this.shadowRoot);
+    this.#bindMethods();
+  }
 
+  #bindMethods() {
     this.close = this.close.bind(this);
     this.delete = this.delete.bind(this);
   }
@@ -42,6 +45,26 @@ class Menu extends HTMLElement {
     }
   }
 
+  close(event) {
+    if (event.target.id !== "overlay") return;
+    this.#animateOut();
+  }
+
+  /**
+   * Delete a project
+   */
+  async delete() {
+    const response = await fetch(`${basePath}/api/project/${this.#projectId}/delete`, {
+      method: "POST"
+    });
+
+    this.#showFeedback(response.ok);
+  }
+
+  //--------------------------------------------------------------------------
+  // ANIMATIONS 
+  //--------------------------------------------------------------------------
+
   #animateIn() {
     gsap.set(this.#overlay, { opacity: 0 });
 
@@ -53,8 +76,7 @@ class Menu extends HTMLElement {
     gsap.from(this.#wrapper, { y: 200 });
   }
 
-  close(event) {
-    if (event.target.id !== "overlay") return;
+  #animateOut() {
     //animate out
     gsap.to(this.#overlay, {
       opacity: 0,
@@ -64,33 +86,22 @@ class Menu extends HTMLElement {
     gsap.to(this.#wrapper, { y: 400, onComplete: () => { this.remove(); } });
   }
 
-  async delete() {
+  #showFeedback(suceeded) {
     const feedback = document.createElement("div");
+
     feedback.id = "feedback";
-
-    // if reRoute is true go to index else remove feedback.
-    const onFeedback = (reRoute) => {
-      if (reRoute) {
-        router.navigateTo("/")
-      } else {
-        feedback.remove()
-      }
-    }
-
-    // Delete project
-    const response = await fetch(`${basePath}/api/project/${this.#projectId}/delete`, {
-      method: "POST"
-    });
-
-    // Show feedback
-    feedback.innerHTML = response.ok ? "<p>Project Deleted</p>" : "<p>Something went wrong</p>";
+    feedback.innerHTML += suceeded ? "<small-loader></small-loader><p>Deleting</p>" : "<p>Something went wrong</p>";
     this.shadowRoot.appendChild(feedback);
 
     gsap.to(feedback, {
       y: 120, duration: 0.3, onComplete: () => {
         setTimeout(() => {
-          onFeedback(response.ok);
-        }, 1000); // 1 second delay
+          if (suceeded) {
+            router.navigateTo("/")
+          } else {
+            feedback.remove()
+          }
+        }, 1000);
       }
     });
   }

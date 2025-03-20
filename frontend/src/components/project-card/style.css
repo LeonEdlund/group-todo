@@ -1,4 +1,4 @@
-@import url(../../styles/shared-styles.css);
+@import url("../../styles/shared-styles.css");
 
 #btn-three-dots {
   background-color: var(--color-accent);

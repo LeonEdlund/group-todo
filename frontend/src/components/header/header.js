@@ -14,7 +14,7 @@ class Header extends HTMLElement {
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (name === "title") {
-      this.shadowRoot.getElementById("title").innerHTML = this.getAttribute("title") || "Title";
+      this.shadowRoot.getElementById("title").innerHTML = newValue || "Title";
     }
   }
 }

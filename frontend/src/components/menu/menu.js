@@ -11,14 +11,18 @@ class Menu extends HTMLElement {
   #deleteBtn;
   #projectId;
 
-  static observedAttributes = ["title", "project-id"];
-
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
     addStylesheetToShadowRoot(style, this.shadowRoot);
     this.#bindMethods();
+
+    this.#projectId;
+  }
+
+  set projectId(id) {
+    this.#projectId = id;
   }
 
   #bindMethods() {
@@ -34,14 +38,6 @@ class Menu extends HTMLElement {
     this.#overlay.addEventListener("click", this.close);
     this.#deleteBtn.addEventListener("click", this.delete);
     this.#animateIn();
-  }
-
-  attributeChangedCallback(name, oldValue, newValue) {
-    switch (name) {
-      case "project-id":
-        this.#projectId = newValue;
-        break;
-    }
   }
 
   close(event) {
@@ -69,7 +65,7 @@ class Menu extends HTMLElement {
 
     gsap.to(this.#overlay, {
       opacity: 1,
-      duration: 0.3
+      duration: 0.2
     });
 
     gsap.from(this.#wrapper, { y: 200 });
@@ -79,7 +75,7 @@ class Menu extends HTMLElement {
     //animate out
     gsap.to(this.#overlay, {
       opacity: 0,
-      duration: 0.3
+      duration: 0.2
     });
 
     gsap.to(this.#wrapper, { y: 400, onComplete: () => { this.remove(); } });
@@ -93,7 +89,7 @@ class Menu extends HTMLElement {
     this.shadowRoot.appendChild(feedback);
 
     gsap.to(feedback, {
-      y: 120, duration: 0.3, onComplete: () => {
+      y: 120, duration: 0.2, onComplete: () => {
         setTimeout(() => {
           if (suceeded) {
             router.navigateTo("/")

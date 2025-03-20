@@ -12,16 +12,16 @@ class UserScoreCard extends HTMLElement {
     addStylesheetToShadowRoot(style, this.shadowRoot);
   }
 
-  attributeChangedCallback(name) {
+  attributeChangedCallback(name, oldValue, newValue) {
     switch (name) {
       case "display-name":
-        this.shadowRoot.querySelector("h3").innerText = this.getAttribute("display-name");
+        this.shadowRoot.querySelector("h3").innerText = newValue || "Name";
         break;
       case "score":
-        this.shadowRoot.querySelector("p").innerText = + this.getAttribute("score") + " Points";
+        this.shadowRoot.querySelector("p").innerText = newValue ? newValue + " Points" : "Score is not avalible";
         break;
       case "profile-pic":
-        this.shadowRoot.querySelector("img").src = this.getAttribute("profile-pic");
+        this.shadowRoot.querySelector("img").src = newValue || "#";
         break;
       default:
         break;

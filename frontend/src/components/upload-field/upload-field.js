@@ -32,7 +32,6 @@ class UploadField extends HTMLElement {
 
     const response = await uploadJSON(`${basePath}/api/add-project`, "POST", {
       title: this.shadowRoot.querySelector("input").value,
-      owner: "1",
       svg: generateSvg().outerHTML
     });
 

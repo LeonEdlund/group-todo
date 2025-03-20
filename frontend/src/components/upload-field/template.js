@@ -1,11 +1,7 @@
-import style from "./style.css?inline";
-
 const template = document.createElement("template");
-template.innerHTML = `
-      <style>
-        ${style}
-      </style>
-      
+export default template;
+
+template.innerHTML = `      
     <div class="todo-group-item name-input-wrapper">
       <div class="todo-group-item-wrapper">
         <div class="flex-row space-between align-center">
@@ -15,4 +11,3 @@ template.innerHTML = `
       </div>
     </div>`;
 
-export default template;

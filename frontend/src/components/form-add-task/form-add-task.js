@@ -23,9 +23,9 @@ class FormAddTask extends HTMLElement {
     this.shadowRoot.getElementById("submit").onclick = null;
   }
 
-  attributeChangedCallback(name) {
+  attributeChangedCallback(name, oldValue, newValue) {
     if (name === "project-id") {
-      this.#projectId = this.getAttribute("project-id");
+      this.#projectId = newValue;
     }
   }
 

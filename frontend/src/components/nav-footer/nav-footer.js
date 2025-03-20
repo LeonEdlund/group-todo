@@ -19,7 +19,7 @@ class NavFooter extends HTMLElement {
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (name === "profile-pic") {
-      this.shadowRoot.querySelector("img").src = this.getAttribute("profile-pic");
+      this.shadowRoot.querySelector("img").src = newValue;
     }
   }
 

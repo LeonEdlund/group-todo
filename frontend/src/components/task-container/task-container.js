@@ -39,19 +39,17 @@ class TaskContainer extends HTMLElement {
   attributeChangedCallback(name, oldValue, newValue) {
     switch (name) {
       case "title":
-        const title = this.getAttribute("title") || "Title";
-        this.shadowRoot.querySelector("#task-title").innerText = title;
+        this.shadowRoot.querySelector("#task-title").innerText = newValue || "Title";
         break;
       case "description":
-        const description = this.getAttribute("description") || "No description";
-        this.shadowRoot.getElementById("description").innerText = description;
+        this.shadowRoot.getElementById("description").innerText = newValue || "No description";
         break;
       case "score":
-        const score = this.getAttribute("score");
+        const score = newValue || "No Score";
         this.shadowRoot.getElementById("assigned").innerText = `Points: ${score}`;
         break;
       case "completed-by":
-        const completedByValue = this.getAttribute("completed-by");
+        const completedByValue = newValue;
         const existingCompletedBy = this.shadowRoot.querySelector("#completed-by");
 
         if (completedByValue && completedByValue.trim() !== "") {

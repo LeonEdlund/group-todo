@@ -19,23 +19,20 @@ class ProjectCard extends HTMLElement {
     this.shadowRoot.getElementById("btn-three-dots").addEventListener("click", this.#menuEvent);
   }
 
-  attributeChangedCallback(name) {
+  attributeChangedCallback(name, oldValue, newValue) {
     switch (name) {
       case "title":
-        const title = this.getAttribute("title") || "Title";
-        this.shadowRoot.querySelector("h2").innerText = title;
+        this.shadowRoot.querySelector("h2").innerText = newValue || "Title";
         break;
       case "created":
-        const createdAt = this.getAttribute("created") || "No Date";
-        this.shadowRoot.querySelector(".date").innerText = createdAt;
+        this.shadowRoot.querySelector(".date").innerText = newValue || "No Date";
         break;
       case "progress":
-        const progress = this.getAttribute("progress") || "0%";
+        const progress = newValue || "0%";
         this.shadowRoot.querySelector("progress-bar").setAttribute("completed", progress);
         break;
       case "cover_img":
-        const coverImg = this.getAttribute("cover_img") || generateSvg().outerHTML;
-        this.shadowRoot.querySelector(".img-container").innerHTML = coverImg;
+        this.shadowRoot.querySelector(".img-container").innerHTML = newValue || generateSvg().outerHTML;
         break;
     }
   }

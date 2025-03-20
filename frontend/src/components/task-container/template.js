@@ -27,6 +27,3 @@ template.innerHTML = `
         </div>
           
       </div>`;
-
-//       <p>Completed By</p>
-// <i id="completed-by"></i>

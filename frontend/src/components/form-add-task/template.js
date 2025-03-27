@@ -3,8 +3,8 @@ export default template;
 
 template.innerHTML = `
 <form>
-  <input type="text" name="title" placeholder="Title...">
-  <textarea type="text" name="description" rows="8" placeholder="Description..."></textarea>
+  <input type="text" name="title" id="title" placeholder="Title...">
+  <textarea type="text" name="description" id="description" rows="8" placeholder="Description..."></textarea>
 
   <select name="score" id="score">
     <option disabled selected>Score</option>

@@ -70,7 +70,10 @@ class ProjectView extends HTMLElement {
   }
 
   #registerModals() {
-    ModalHandler.register("add-task-modal", this.shadowRoot.getElementById("add-task-modal"));
+    ModalHandler.register("add-task-modal", this.shadowRoot.getElementById("add-task-modal"), null, () => {
+      const event = new CustomEvent("addTaskModal:close");
+      document.dispatchEvent(event);
+    });
     ModalHandler.register("score-modal", this.shadowRoot.getElementById("scores-modal"), this.loadScores);
     ModalHandler.register("share-modal", this.shadowRoot.getElementById("share-modal"), this.shareModalInit);
   }

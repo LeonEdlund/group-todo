@@ -50,6 +50,7 @@ ul {
 li {
   display: flex;
   align-items: center;
+  cursor: pointer;
   gap: 0.6rem;
   font-family: var(--font-family-lexend);
   font-size: var(--font-heading-2);

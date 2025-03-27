@@ -12,22 +12,29 @@ class UploadField extends HTMLElement {
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
     addStylesheetToShadowRoot(style, this.shadowRoot);
+    this.#bindMethods();
+  }
+
+  #bindMethods() {
+    this.uploadProject = this.uploadProject.bind(this);
+    this.toggleInvalidClass = this.toggleInvalidClass.bind(this);
   }
 
   connectedCallback() {
-    this.shadowRoot.querySelector("button").onclick = () => { this.#uploadProject() };
+    this.shadowRoot.querySelector("button").addEventListener("click", this.uploadProject);
+    document.addEventListener("nameMenu:closed", this.toggleInvalidClass);
   }
 
   disconnectedCallback() {
-    this.shadowRoot.querySelector("button").onclick = null;
+    this.shadowRoot.querySelector("button").removeEventListener("click", this.uploadProject);
+    document.removeEventListener("nameMenu:closed", this.toggleInvalidClass);
   }
 
-  async #uploadProject() {
+  async uploadProject() {
     const title = this.shadowRoot.querySelector("input").value;
 
     if (!title) {
-      this.shadowRoot.querySelector(".name-input-wrapper").classList.add("invalid");
-      console.log("provide a name");
+      this.toggleInvalidClass();
       return;
     };
 
@@ -39,6 +46,10 @@ class UploadField extends HTMLElement {
     if (response.id) {
       router.navigateTo(`project/${response.id}`);
     }
+  }
+
+  toggleInvalidClass() {
+    this.shadowRoot.querySelector(".name-input-wrapper").classList.toggle("invalid");
   }
 }
 

@@ -55,6 +55,8 @@ class Home extends HTMLElement {
   }
 
   closePopUp() {
+    const closeEvent = new CustomEvent("nameMenu:closed");
+    document.dispatchEvent(closeEvent);
     this.#updateHeaderTitle("Your<br>Projects");
     this.shadowRoot.querySelector("#pop-up").classList.add("hidden");
     this.#allowScroll(true);

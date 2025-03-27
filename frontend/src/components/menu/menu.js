@@ -49,11 +49,16 @@ class Menu extends HTMLElement {
    * Delete a project
    */
   async delete() {
-    const response = await fetch(`${basePath}/api/project/${this.#projectId}/delete`, {
-      method: "POST"
-    });
+    try {
+      const response = await fetch(`${basePath}/api/project/${this.#projectId}/delete`, {
+        method: "POST"
+      });
 
-    this.#showFeedback(response.ok);
+      this.#showFeedback(response.ok);
+    } catch (e) {
+      console.log(e)
+      this.#showFeedback(false);
+    }
   }
 
   //--------------------------------------------------------------------------
@@ -83,11 +88,12 @@ class Menu extends HTMLElement {
 
   #showFeedback(suceeded) {
     const feedback = document.createElement("div");
-
+    feedback.innerHTML = suceeded ? "<small-loader></small-loader><p>Deleting</p>" : "<p>Something went wrong</p>";
     feedback.id = "feedback";
-    feedback.innerHTML += suceeded ? "<small-loader></small-loader><p>Deleting</p>" : "<p>Something went wrong</p>";
+
     this.shadowRoot.appendChild(feedback);
 
+    // ANIMATE FEEDBACK IN AND OUT
     gsap.to(feedback, {
       y: 120, duration: 0.2, onComplete: () => {
         setTimeout(() => {

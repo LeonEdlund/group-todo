@@ -114,13 +114,22 @@ $app->get("/project/{id:\d+}", function ($req, $res, $args) {
   return $res->withJson($project, 200);
 })->add($authenticate);
 
-// Deletes a project
+/**
+ * 
+ * DELETES A PROJECT IF USER IS PART OF IT.
+ * 
+ */
 $app->post("/project/{id:\d+}/delete", function ($req, $res, $args) {
   global $db;
+  $userId = $_SESSION["user"]->user_id;
 
-  $db->deleteProject($args["id"]);
+  $success = $db->deleteProject($args["id"], $userId);
 
-  return $res->withStatus(204);
+  if ($success) {
+    return $res->withStatus(204);
+  } else {
+    return $res->withStatus(400);
+  }
 })->add($authenticate);
 
 // Returns users scores
@@ -202,10 +211,5 @@ $app->post("/project/{project_id:\d+}/tasks/{task_id:\d+}/uncompleted", function
 
   return $res->withJson($response);
 })->add($authenticate);
-
-$app->get("/test", function ($req, $res, $args) {
-  echo $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_ENV["AUTH_REDIRECT_CALLBACK"];
-});
-
 
 $app->run();

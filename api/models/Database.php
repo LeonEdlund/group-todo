@@ -132,11 +132,14 @@ class Database
     return ["id" => $projectId];
   }
 
-  public function deleteProject($projectId)
+  // DELETES A PROJECT IF USER IS PART OF THE PROJECT
+  public function deleteProject($projectId, $userId)
   {
-    $query = "DELETE FROM webb6_projects AS project WHERE project.project_id = :id;";
-    $status = $this->query($query, [":id" => $projectId]);
-    return $status;
+    $query = "DELETE FROM webb6_projects WHERE project_id = :id AND EXISTS (SELECT 1 from webb6_project_members WHERE project_id = :id AND user_id = :user_id)";
+
+    $status = $this->query($query, [":id" => $projectId, ":user_id" => $userId]);
+
+    return $status->rowCount();
   }
 
   /** 

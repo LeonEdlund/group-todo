@@ -28,7 +28,7 @@ class Home extends HTMLElement {
   }
 
   connectedCallback() {
-    this.#itemWrapper.innerHTML = `<small-loader class="center"></h3>`;
+    this.#itemWrapper.innerHTML = `<small-loader class="center"></small-loader>`;
     this.#addEventlisteners();
     this.#fetchData();
   }
@@ -108,10 +108,9 @@ class Home extends HTMLElement {
 
   openEditMenu(event) {
     const projectId = event.detail.id;
-    console.log(projectId);
-    const menu = document.createElement("custom-menu");
     if (!projectId) return;
 
+    const menu = document.createElement("custom-menu");
     menu.projectId = projectId;
     this.shadowRoot.appendChild(menu);
   }

@@ -17,24 +17,25 @@ class UploadField extends HTMLElement {
 
   #bindMethods() {
     this.uploadProject = this.uploadProject.bind(this);
-    this.toggleInvalidClass = this.toggleInvalidClass.bind(this);
+    this.addInvalidClass = this.addInvalidClass.bind(this);
+    this.removeInvalidClass = this.removeInvalidClass.bind(this);
   }
 
   connectedCallback() {
     this.shadowRoot.querySelector("button").addEventListener("click", this.uploadProject);
-    document.addEventListener("nameMenu:closed", this.toggleInvalidClass);
+    document.addEventListener("nameMenu:closed", this.removeInvalidClass);
   }
 
   disconnectedCallback() {
     this.shadowRoot.querySelector("button").removeEventListener("click", this.uploadProject);
-    document.removeEventListener("nameMenu:closed", this.toggleInvalidClass);
+    document.removeEventListener("nameMenu:closed", this.removeInvalidClass);
   }
 
   async uploadProject() {
     const title = this.shadowRoot.querySelector("input").value;
 
     if (!title) {
-      this.toggleInvalidClass();
+      this.addInvalidClass();
       return;
     };
 
@@ -48,8 +49,12 @@ class UploadField extends HTMLElement {
     }
   }
 
-  toggleInvalidClass() {
-    this.shadowRoot.querySelector(".name-input-wrapper").classList.toggle("invalid");
+  addInvalidClass() {
+    this.shadowRoot.querySelector(".name-input-wrapper").classList.add("invalid");
+  }
+
+  removeInvalidClass() {
+    this.shadowRoot.querySelector(".name-input-wrapper").classList.remove("invalid");
   }
 }
 

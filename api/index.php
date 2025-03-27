@@ -146,6 +146,20 @@ $app->get("/project/{id:\d+}/join", function ($req, $res, $args) {
   return $res->withRedirect("{$_ENV['REROUTE_PATH']}project/{$args['id']}", 301);
 });
 
+// Post - Creates a new project and returns the project id.
+$app->post("/add-project", function ($req, $res, $args) {
+  global $db;
+  $input = $req->getParsedBody();
+
+  // check if title is empty
+  if (!isset($input["title"]) || strlen(trim($input["title"])) === 0) {
+    return $res->withStatus(400);
+  }
+
+  $id = $db->insertProject($input["title"], $_SESSION["user"]->user_id, $input["svg"]);
+  return $res->withJson($id);
+})->add($authenticate);
+
 /** 
  * -----------------------------
  * Tasks
@@ -187,15 +201,6 @@ $app->post("/project/{project_id:\d+}/tasks/{task_id:\d+}/uncompleted", function
   $response = $db->uncompleteTask($args["project_id"], $args["task_id"]);
 
   return $res->withJson($response);
-})->add($authenticate);
-
-// Post - Returns a specific post 
-$app->post("/add-project", function ($req, $res, $args) {
-  global $db;
-
-  $input = $req->getParsedBody();
-  $id = $db->insertProject($input["title"], $_SESSION["user"]->user_id, $input["svg"]);
-  return $res->withJson($id);
 })->add($authenticate);
 
 $app->get("/test", function ($req, $res, $args) {

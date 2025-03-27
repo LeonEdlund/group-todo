@@ -121,6 +121,8 @@ class Database
     // INSERT PROJECT
     $query = "INSERT INTO webb6_projects (title, cover_svg) VALUES (:title, :svg);";
     $this->query($query, [":title" => $title, ":svg" => $svg]);
+
+    // GET PROJECT ID
     $projectId = $this->lastInsertId();
 
     // INSERT OWNER IN MEMBERS TABLE

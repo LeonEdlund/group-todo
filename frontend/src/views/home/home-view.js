@@ -31,7 +31,6 @@ class Home extends HTMLElement {
     this.#itemWrapper.innerHTML = `<small-loader class="center"></h3>`;
     this.#addEventlisteners();
     this.#fetchData();
-    // this.#itemWrapper.addEventListener("click", this.navigateTo);
   }
 
   disconnectedCallback() {

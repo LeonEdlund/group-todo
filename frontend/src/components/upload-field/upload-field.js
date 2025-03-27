@@ -26,6 +26,7 @@ class UploadField extends HTMLElement {
     const title = this.shadowRoot.querySelector("input").value;
 
     if (!title) {
+      this.shadowRoot.querySelector(".name-input-wrapper").classList.add("invalid");
       console.log("provide a name");
       return;
     };

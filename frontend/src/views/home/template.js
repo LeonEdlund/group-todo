@@ -13,6 +13,3 @@ template.innerHTML = `
       </div>
     </div>
     `;
-
-
-// <project-list></project-list>

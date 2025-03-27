@@ -1,5 +1,11 @@
 @import url("../../styles/shared-styles.css");
 
+.name-input-wrapper {
+  border-bottom: 1px solid rgb(175, 175, 175);
+  margin-top: 1.2rem;
+  color: rgb(175, 175, 175);
+}
+
 #input-group-name {
   font-size: var(--font-heading-2);
   padding: 0;
@@ -7,7 +13,7 @@
   border: none;
   font-family: var(--font-family-lexend);
   font-weight: var(--font-weight-regular);
-  color: rgb(175, 175, 175);
+  color: inherit;
   min-width: 0px;
 }
 
@@ -18,17 +24,12 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.name-input-wrapper {
-  margin-top: 1.2rem;
-}
-
 .btn-arrow {
   font-size: 2rem;
   margin-right: 1rem;
   opacity: 0.7;
 }
 
-.todo-group-item {
-  border-bottom: 1px solid rgb(175, 175, 175);
-  ;
+.invalid {
+  border-bottom: 1px solid rgb(177, 10, 10);
 }

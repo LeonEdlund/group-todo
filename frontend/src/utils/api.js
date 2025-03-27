@@ -1,9 +1,15 @@
 export async function getData(path) {
   try {
     const response = await fetch(path);
-    return await response.json();
+
+    if (response.ok) {
+      return await response.json();
+    }
+
+    return null;
   } catch (e) {
-    return {};
+    console.error(e);
+    return null;
   }
 }
 

@@ -4,7 +4,6 @@ session_start();
 
 require "vendor/autoload.php";
 require "models/Database.php";
-require "Validator.php";
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
@@ -100,7 +99,6 @@ $app->get("/projects", function ($req, $res, $args) {
   global $db;
 
   $id = $_SESSION["user"]->user_id;
-
   $projects = $db->getAllProjects($id);
 
   return $res->withJson($projects, 200);
@@ -114,9 +112,15 @@ $app->get("/projects", function ($req, $res, $args) {
 $app->get("/project/{id:\d+}", function ($req, $res, $args) {
   global $db;
   $userId = $_SESSION["user"]->user_id;
+  $projectId = $args["id"];
 
-  $project = $db->getProject($args["id"], $userId);
+  // CHECK IF USER IS PART OF PROJECT
+  $isMember = $db->isMember($projectId, $userId);
+  if (!$isMember) {
+    return $res->withStatus(401);
+  }
 
+  $project = $db->getProject($projectId);
   return $res->withJson($project, 200);
 })->add($authenticate);
 
@@ -128,6 +132,13 @@ $app->get("/project/{id:\d+}", function ($req, $res, $args) {
 $app->post("/project/{id:\d+}/delete", function ($req, $res, $args) {
   global $db;
   $userId = $_SESSION["user"]->user_id;
+  $projectId = $args["id"];
+
+  // CHECK IF USER IS PART OF PROJECT
+  $isMember = $db->isMember($projectId, $userId);
+  if (!$isMember) {
+    return $res->withStatus(401);
+  }
 
   $success = $db->deleteProject($args["id"], $userId);
 
@@ -138,27 +149,46 @@ $app->post("/project/{id:\d+}/delete", function ($req, $res, $args) {
   }
 })->add($authenticate);
 
-// Returns users scores
+/**
+ * RETURNS ALL SCORES FOR A PROJECT
+ * USER HAS TO BE AUTHENTICATED AND PART OF PROJECT.  
+ * 
+ */
 $app->get("/project/{id:\d+}/scores", function ($req, $res, $args) {
   global $db;
+  $userId = $_SESSION["user"]->user_id;
+  $projectId = $args["id"];
 
-  $scores = $db->getTotalScore($args["id"]);
+  // CHECK IF USER IS PART OF PROJECT
+  $isMember = $db->isMember($projectId, $userId);
+  if (!$isMember) {
+    return $res->withStatus(401);
+  }
+
+  $scores = $db->getTotalScore($projectId);
 
   return $res->withJson($scores, 200);
 })->add($authenticate);
 
-// Specific project - Returns a post based on id 
+/**
+ * JOIN USER TO PROJECT IF THEY ARE NOT ALREADY PART OF PROJECT.
+ * 
+ */
 $app->get("/project/{id:\d+}/join", function ($req, $res, $args) {
+  global $db;
+  $userId = $_SESSION["user"]->user_id;
+  $projectId = $args["id"];
+  $reRoute = $_ENV['REROUTE_PATH'];
+
+  // CHECK IF USER IS LOGGED IN IF NOT REDIRECT 
   if (!isset($_SESSION['user'])) {
-    $_SESSION["redirect_path_after_login"] = "{$_ENV['REROUTE_PATH']}project/{$args['id']}/join";
-    return $res->withRedirect("{$_ENV['REROUTE_PATH']}login", 301);
+    $_SESSION["redirect_path_after_login"] = "{$reRoute}project/{$projectId}/join";
+    return $res->withRedirect("{$reRoute}login", 301);
   }
 
-  global $db;
+  $db->insertMember($userId, $projectId);
 
-  $db->insertMember($_SESSION["user"]->user_id, $args["id"]);
-
-  return $res->withRedirect("{$_ENV['REROUTE_PATH']}project/{$args['id']}", 301);
+  return $res->withRedirect("{$reRoute}project/{$projectId}", 301);
 });
 
 /**
@@ -184,10 +214,22 @@ $app->post("/add-project", function ($req, $res, $args) {
  * --------------------------------------------------------
  */
 
+/**
+ * GET ALL TASKS CONNECTED TO A PROJECT
+ * 
+ */
 $app->get("/project/{id:\d+}/tasks", function ($req, $res, $args) {
   global $db;
+  $userId = $_SESSION["user"]->user_id;
+  $projectId = $args["id"];
 
-  $tasks = $db->getTasks($args["id"], $_SESSION["user"]->user_id);
+  // CHECK IF USER IS PART OF PROJECT
+  $isMember = $db->isMember($projectId, $userId);
+  if (!$isMember) {
+    return $res->withStatus(401);
+  }
+
+  $tasks = $db->getTasks($projectId, $_SESSION["user"]->user_id);
 
   return $res->withJson($tasks, 200);
 })->add($authenticate);
@@ -211,7 +253,8 @@ $app->post("/project/{id:\d+}/tasks", function ($req, $res, $args) {
   ];
 
   // CHECK IF USER IS PART OF PROJECT
-  if (!$db->isMember($projectId, $userId)) {
+  $isMember = $db->isMember($projectId, $userId);
+  if (!$isMember) {
     return $res->withStatus(401);
   }
 
@@ -225,27 +268,46 @@ $app->post("/project/{id:\d+}/tasks", function ($req, $res, $args) {
   return $res->withJson(["input" => $input], 201);
 })->add($authenticate);
 
-
-
-
-
-
-
-// Patch - Updates the completion status of a task
+/**
+ * COMPLETE A TASK
+ * USER HAS TO BE AUTHENTICATED AND PART OF PROJECT. 
+ * 
+ */
 $app->post("/project/{project_id:\d+}/tasks/{task_id:\d+}/completed", function ($req, $res, $args) {
   global $db;
+  $userId = $_SESSION["user"]->user_id;
+  $projectId = $args["project_id"];
+  $taskId = $args["task_id"];
 
-  $input = $req->getParsedBody();
-  $response = $db->completeTask($args["project_id"], $args["task_id"], $_SESSION["user"]->user_id);
+  // CHECK IF USER IS PART OF PROJECT
+  $isMember = $db->isMember($projectId, $userId);
+  if (!$isMember) {
+    return $res->withStatus(401);
+  }
+
+  $response = $db->completeTask($projectId, $taskId, $userId);
 
   return $res->withJson($response);
 })->add($authenticate);
 
+/**
+ * UNCOMPLETE A TASK
+ * USER HAS TO BE AUTHENTICATED AND PART OF PROJECT. 
+ * 
+ */
 $app->post("/project/{project_id:\d+}/tasks/{task_id:\d+}/uncompleted", function ($req, $res, $args) {
   global $db;
+  $userId = $_SESSION["user"]->user_id;
+  $projectId = $args["project_id"];
+  $taskId = $args["task_id"];
 
-  $input = $req->getParsedBody();
-  $response = $db->uncompleteTask($args["project_id"], $args["task_id"]);
+  // CHECK IF USER IS PART OF PROJECT
+  $isMember = $db->isMember($projectId, $userId);
+  if (!$isMember) {
+    return $res->withStatus(401);
+  }
+
+  $response = $db->uncompleteTask($projectId, $taskId, $userId);
 
   return $res->withJson($response);
 })->add($authenticate);

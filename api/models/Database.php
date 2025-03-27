@@ -66,7 +66,7 @@ class Database
     $projectsById = [];
 
     // Get project info
-    $basicInfoquery = "SELECT 
+    $query = "SELECT 
     p.project_id,
     p.title,
     p.cover_svg AS img,
@@ -76,7 +76,7 @@ class Database
     WHERE m.user_id = :user_id
     ORDER BY p.created_at DESC;";
 
-    $projects = $this->query($basicInfoquery, ["user_id" => $userId])->fetchAll();
+    $projects = $this->query($query, ["user_id" => $userId])->fetchAll();
 
     foreach ($projects as $project) {
       $projectsById[$project->project_id] = $project;
@@ -93,19 +93,19 @@ class Database
    * @param string - id of the project
    * @return Object
    */
-  public function getProject($projectId, $userId)
+  public function getProject($projectId)
   {
-    $basicInfoquery = "SELECT 
+    $query = "SELECT 
     p.project_id,
     p.title,
     p.cover_svg AS img,
     p.created_at
     FROM webb6_projects AS p
-    INNER JOIN webb6_project_members AS m ON p.project_id = m.project_id
-    WHERE m.user_id = :user_id AND p.project_id = :project_id
+    WHERE p.project_id = :project_id
     ORDER BY p.created_at DESC;";
 
-    $project = $this->query($basicInfoquery, [":project_id" => $projectId, ":user_id" => $userId])->fetch();
+    $project = $this->query($query, [":project_id" => $projectId])->fetch();
+
     if ($project) {
       $project->progress = $this->getProgress($projectId)->progress_percentage;
       $project->members = $this->getMembers($projectId);
@@ -131,11 +131,10 @@ class Database
   }
 
   // DELETES A PROJECT IF USER IS PART OF THE PROJECT
-  public function deleteProject($projectId, $userId)
+  public function deleteProject($projectId)
   {
-    $query = "DELETE FROM webb6_projects WHERE project_id = :id AND EXISTS (SELECT 1 from webb6_project_members WHERE project_id = :id AND user_id = :user_id)";
-
-    $status = $this->query($query, [":id" => $projectId, ":user_id" => $userId]);
+    $query = "DELETE FROM webb6_projects WHERE project_id = :id";
+    $status = $this->query($query, [":id" => $projectId]);
 
     return $status->rowCount();
   }
@@ -153,9 +152,13 @@ class Database
     return $this->query($query, ["project_id" => $projectId])->fetchAll();
   }
 
+  /**
+   * INSERT MEMBER TO PROJECT
+   */
   public function insertMember($userId, $projectId)
   {
-    $query = "INSERT INTO webb6_project_members (user_id, project_id) VALUES (:user_id, :project_id) ON DUPLICATE KEY UPDATE user_id = user_id";
+    $query = "INSERT INTO webb6_project_members (user_id, project_id) 
+    VALUES (:user_id, :project_id) ON DUPLICATE KEY UPDATE user_id = user_id";
 
     return $this->query($query, [":user_id" => $userId, ":project_id" => $projectId]);
   }
@@ -189,7 +192,7 @@ class Database
    * @param string - id of the project
    * @return Object
    */
-  public function getTasks($id, $userId)
+  public function getTasks($id)
   {
     $query = "SELECT 
     tasks.task_id,
@@ -199,11 +202,10 @@ class Database
     users.display_name AS completed_by
     FROM webb6_tasks AS tasks
     LEFT JOIN webb6_users AS users ON tasks.completed_by = users.user_id
-    INNER JOIN webb6_project_members AS members ON tasks.project_id = members.project_id
-    WHERE tasks.project_id = :id AND members.user_id = :user_id
+    WHERE tasks.project_id = :id
     ORDER BY tasks.created_at DESC;";
 
-    return $this->query($query, [":id" => $id, ":user_id" => $userId])->fetchAll();
+    return $this->query($query, [":id" => $id])->fetchAll();
   }
 
   /**
@@ -224,6 +226,10 @@ class Database
     return ["id" => $this->lastInsertId()];
   }
 
+  /**
+   * Inserts a new task.
+   * 
+   */
   public function completeTask($projectId, $taskId, $user)
   {
     $query = "UPDATE webb6_tasks AS tasks SET tasks.completed_by = :user WHERE tasks.project_id = :project_id AND tasks.task_id = :task_id";

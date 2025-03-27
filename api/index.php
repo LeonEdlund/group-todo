@@ -3,14 +3,14 @@ error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE);
 session_start();
 
 require "vendor/autoload.php";
+require "models/Database.php";
+require "Validator.php";
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
 use \Slim\Http\Request as Request;
 use \Slim\Http\Response as Response;
-
-require "models/Database.php";
 
 $config = [
   'settings' => [
@@ -19,18 +19,16 @@ $config = [
 ];
 
 $app = new \Slim\App($config);
-
 $client = new Google\Client();
 $client->setAuthConfig('client_secret.json');
 $client->setRedirectUri($_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_ENV["AUTH_REDIRECT_CALLBACK"]);
 $client->setScopes('openid email profile');
-
 $db = new Database();
 
 /** 
- * -----------------------------
+ * ---------------------------------------------------------
  * AUTH MIDDLEWARE
- * ----------------------------
+ * --------------------------------------------------------
  */
 
 $authenticate = function ($req, $res, $next) {
@@ -41,9 +39,9 @@ $authenticate = function ($req, $res, $next) {
 };
 
 /** 
- * -----------------------------
+ * ---------------------------------------------------------
  * LOGIN AND USER ROUTS
- * ----------------------------
+ * --------------------------------------------------------
  */
 
 $app->get('/auth/callback', function (Request $req, Response $res, $args) {
@@ -88,12 +86,16 @@ $app->get('/userinfo', function (Request $req, Response $res, $args) {
 })->add($authenticate);
 
 /** 
- * -----------------------------
+ * ---------------------------------------------------------
  * GET PROJECT INFORMATION
- * ----------------------------
+ * --------------------------------------------------------
  */
 
-// Projects - Returns all 
+/**
+ * RETURNS ALL PROJECTS USER IS PART OF.
+ * USER HAS TO BE AUTHENTICATED.
+ * 
+ */
 $app->get("/projects", function ($req, $res, $args) {
   global $db;
 
@@ -104,7 +106,11 @@ $app->get("/projects", function ($req, $res, $args) {
   return $res->withJson($projects, 200);
 })->add($authenticate);
 
-// Specific project - Returns a post based on id 
+/**
+ * RETURNS A PROJECT BASED ON ID.
+ * USER HAS TO BE AUTHENTICATED AND PART OF PROJECT.  
+ * 
+ */
 $app->get("/project/{id:\d+}", function ($req, $res, $args) {
   global $db;
   $userId = $_SESSION["user"]->user_id;
@@ -115,8 +121,8 @@ $app->get("/project/{id:\d+}", function ($req, $res, $args) {
 })->add($authenticate);
 
 /**
- * 
  * DELETES A PROJECT IF USER IS PART OF IT.
+ * USER HAS TO BE AUTHENTICATED AND PART OF PROJECT. 
  * 
  */
 $app->post("/project/{id:\d+}/delete", function ($req, $res, $args) {
@@ -155,13 +161,16 @@ $app->get("/project/{id:\d+}/join", function ($req, $res, $args) {
   return $res->withRedirect("{$_ENV['REROUTE_PATH']}project/{$args['id']}", 301);
 });
 
-// Post - Creates a new project and returns the project id.
+/**
+ * CREATES A NEW PROJECT TIED TO THE LOGGED IN USER. 
+ * 
+ */
 $app->post("/add-project", function ($req, $res, $args) {
   global $db;
   $input = $req->getParsedBody();
+  $title = trim($input["title"]);
 
-  // check if title is empty
-  if (!isset($input["title"]) || strlen(trim($input["title"])) === 0) {
+  if (empty($title)) {
     return $res->withStatus(400);
   }
 
@@ -170,9 +179,9 @@ $app->post("/add-project", function ($req, $res, $args) {
 })->add($authenticate);
 
 /** 
- * -----------------------------
+ * ---------------------------------------------------------
  * Tasks
- * ----------------------------
+ * --------------------------------------------------------
  */
 
 $app->get("/project/{id:\d+}/tasks", function ($req, $res, $args) {
@@ -183,15 +192,44 @@ $app->get("/project/{id:\d+}/tasks", function ($req, $res, $args) {
   return $res->withJson($tasks, 200);
 })->add($authenticate);
 
-// Post - Returns a specific post 
+/**
+ * ADD A NEW TASK TO A PROJECT
+ * USER HAS TO BE AUTHENTICATED AND PART OF PROJECT. 
+ * 
+ */
 $app->post("/project/{id:\d+}/tasks", function ($req, $res, $args) {
   global $db;
-
   $input = $req->getParsedBody();
-  $db->insertTask($args["id"], $input);
+
+  // INSERT DATA
+  $userId = $_SESSION["user"]->user_id;
+  $projectId = $args["id"];
+  $dbInserts = [
+    "title" => trim($input["title"]),
+    "description" => trim($input["description"]),
+    "score" => trim($input["score"]),
+  ];
+
+  // CHECK IF USER IS PART OF PROJECT
+  if (!$db->isMember($projectId, $userId)) {
+    return $res->withStatus(401);
+  }
+
+  // CHECK INPUT
+  if (empty($dbInserts["title"]) || empty($dbInserts["score"])) {
+    return $res->withStatus(400);
+  }
+
+  $db->insertTask($projectId, $dbInserts);
 
   return $res->withJson(["input" => $input], 201);
 })->add($authenticate);
+
+
+
+
+
+
 
 // Patch - Updates the completion status of a task
 $app->post("/project/{project_id:\d+}/tasks/{task_id:\d+}/completed", function ($req, $res, $args) {

@@ -87,8 +87,6 @@ class Database
     return array_values($projectsById);
   }
 
-
-
   /** 
    * Returns a single project
    * 
@@ -208,11 +206,20 @@ class Database
     return $this->query($query, [":id" => $id, ":user_id" => $userId])->fetchAll();
   }
 
-  public function insertTask($id, $args)
+  /**
+   * Inserts a new task.
+   * 
+   */
+  public function insertTask($projectId, $args)
   {
     $query = "INSERT INTO webb6_tasks (project_id, title, description_text, score) VALUES (:project_id, :title, :description_text, :score)";
 
-    $this->query($query, [":project_id" => $id, ":title" => $args["title"], ":description_text" => $args["description"],  ":score" => $args["score"]]);
+    $this->query($query, [
+      ":project_id" => $projectId,
+      ":title" => $args["title"],
+      ":description_text" => $args["description"],
+      ":score" => $args["score"]
+    ]);
 
     return ["id" => $this->lastInsertId()];
   }
@@ -289,5 +296,14 @@ class Database
   public function lastInsertId()
   {
     return $this->connection->lastInsertId();
+  }
+
+  public function isMember($projectId, $userId)
+  {
+    $query = "SELECT 1 FROM webb6_project_members WHERE project_id = :project_id AND user_id = :user_id";
+
+    $result = $this->query($query, [":project_id" => $projectId, ":user_id" => $userId])->fetch();
+
+    return $result ? true : false;
   }
 }

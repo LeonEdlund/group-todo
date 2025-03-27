@@ -59,6 +59,8 @@
 #back-btn {
   display: flex;
   align-items: center;
+  cursor: pointer;
+  width: min-content;
 }
 
 #tasks-wrapper {

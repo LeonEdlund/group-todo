@@ -248,22 +248,34 @@ class Database
     return  $returArr;
   }
 
-  public function uncompleteTask($projectId, $taskId)
+  public function uncompleteTask($projectId, $taskId, $userId)
   {
-    $query = "UPDATE webb6_tasks AS tasks SET tasks.completed_by = null WHERE tasks.project_id = :project_id AND tasks.task_id = :task_id";
+    $query = "UPDATE webb6_tasks AS tasks SET tasks.completed_by = null WHERE tasks.project_id = :project_id AND tasks.task_id = :task_id AND tasks.completed_by = :user_id";
 
-    $this->query($query, [":project_id" => $projectId, ":task_id" => $taskId]);
+    $result = $this->query($query, [":project_id" => $projectId, ":task_id" => $taskId, ":user_id" => $userId]);
 
-    $progress = $this->getProgress($projectId);
-    $completedBy = $this->getTaskCompletedBy($taskId);
+    $success = $result->rowCount() > 0;
 
-    $returArr = [
-      "project" => $projectId,
-      "completed" => "{$progress->progress_percentage}%",
-      "completed_by" => $completedBy
-    ];
+    if ($success) {
+      $progress = $this->getProgress($projectId);
+      $completedBy = $this->getTaskCompletedBy($taskId);
 
-    return $returArr;
+      $returArr = [
+        "project" => $projectId,
+        "completed" => "{$progress->progress_percentage}%",
+        "completed_by" => $completedBy
+      ];
+
+      return $returArr;
+    } else {
+
+      $completedBy = $this->getTaskCompletedBy($taskId);
+
+      return [
+        "message" => "can't complete somebody elses task",
+        "completed_by" => $completedBy
+      ];
+    }
   }
 
   private function getTaskCompletedBy($id)

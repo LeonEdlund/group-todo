@@ -175,7 +175,8 @@ class Database
     (SELECT project_members.user_id 
     FROM webb6_project_members AS project_members 
     WHERE project_members.project_id = :project_id) 
-    GROUP BY users.user_id, users.display_name;";
+    GROUP BY users.user_id, users.display_name
+    ORDER BY total_score DESC;";
 
     return $this->query($query, [":project_id" => $projectId])->fetchAll();
   }

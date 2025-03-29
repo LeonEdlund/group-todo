@@ -3,7 +3,7 @@ error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE);
 session_start();
 
 require "vendor/autoload.php";
-require "models/Database.php";
+require "Database.php";
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();

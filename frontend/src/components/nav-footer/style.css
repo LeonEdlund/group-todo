@@ -5,9 +5,47 @@
   bottom: 20px;
   left: 20px;
   border-radius: 50%;
+  display: flex;
+  align-items: center;
 }
 
 img {
   border-radius: 50%;
   width: 4rem;
+  cursor: pointer;
+}
+
+div {
+  background-color: var(--color-secondary);
+  border-radius: 12px;
+  height: 3.5rem;
+  width: 0;
+  text-align: center;
+  overflow: hidden;
+  transform: translateX(-50px);
+  z-index: -1;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transition: width 300ms ease-out, opacity 100ms ease-out;
+}
+
+.slide-out {
+  opacity: 1;
+  width: 200px;
+}
+
+button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-family: var(--font-family-inter);
+  font-size: var(--font-body);
+  margin-left: 20px;
+  text-wrap: nowrap;
+}
+
+ion-icon {
+  font-size: 1.5rem;
 }

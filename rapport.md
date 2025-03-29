@@ -46,11 +46,23 @@ Varje uppgift är värd ett poäng mellan 100 - 500 som sätts vid skapandet av 
 
 - **Egna Krav**
 
-  - En unik bild ska vara kopplad till varje lista.
+  - En unik bild som identifierar och är kopplad till varje lista. ✅
+
+  - Anävdare ska visuellt kunna överskåda hur mycket av ett projekt som blivit avklarat. ✅
 
 ## Utvärdering av kravspecifikationen 
-Alla krav är uppfyllda
+Samtliga krav i kravspecifikationen uppfylls. Användaren kan logga in via Google för att skapa och se data kopplat till sitt konto. Funktionaliteten för att skapa ett todo-projekt är implementerad, och andra användare kan bjudas in via en länk för att delta i ett gemensamt projekt.
 
+Alla deltagare i ett projekt kan lägga till uppgifter i listan, med möjlighet att ange en titel, en valfri beskrivning samt ett poängvärde för uppgiften. När en uppgift markeras som avklarad får användaren de poäng som är kopplade till uppgiften. Den aktuella poängställningen visas tydligt i en highscore-lista.
+
+Det framgår tydligt vem som har avklarat en uppgift, och endast den användaren kan bocka av samma uppgift igen. Detta säkerställer att poängen inte kan manipuleras av andra deltagare.
+
+Utöver de specificerade kraven har två extra funktioner lagts till för att förbättra användarupplevelsen:
+
+En slumpgenererad SVG-bild kopplas till varje projekt för att gör applikatione mer visuellt tilltalande och skapa visuell igenkänning.
+
+En progressbar visar hur stor andel av listan som är avklarad, vilket ger en tydlig översikt av projektets status.
+Dessa tillägg stärker både användbarheten och den visuella feedbacken i applikationen.
 
 ## Använda kodbibliotek
 

@@ -11,9 +11,15 @@ class NavFooter extends HTMLElement {
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
     addStylesheetToShadowRoot(style, this.shadowRoot);
+    this.bindMethods();
+  }
+
+  bindMethods() {
+    this.toggleLogout = this.toggleLogout.bind(this);
   }
 
   connectedCallback() {
+    this.shadowRoot.querySelector("img").addEventListener("click", this.toggleLogout);
     this.shadowRoot.querySelector("button").addEventListener("click", this.#logout);
   }
 
@@ -21,6 +27,10 @@ class NavFooter extends HTMLElement {
     if (name === "profile-pic") {
       this.shadowRoot.querySelector("img").src = newValue;
     }
+  }
+
+  toggleLogout() {
+    this.shadowRoot.querySelector("div").classList.toggle("slide-out");
   }
 
   #logout() {
